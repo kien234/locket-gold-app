@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" id="dynamic-favicon" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Locket Gold | Nâng Cấp Locket Gold Premium Tự Động Uy Tín Số 1</title>
+    <meta name="description" content="Nâng cấp Locket Gold tự động chỉ bằng Username. Hỗ trợ kích hoạt Locket Gold Premium cực nhanh trong 5s. Bảo hành vĩnh viễn, không cần iCloud hay mật khẩu!" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      #app-preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #0B0F17;
+        color: #FFFFFF;
+        font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+        transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+      }
+      #app-preloader.loaded {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .preloader-crown {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 16px;
+        animation: pulseCrown 1.8s infinite ease-in-out;
+      }
+      @keyframes pulseCrown {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.4)); }
+        50% { transform: scale(1.08); filter: drop-shadow(0 0 28px rgba(245, 158, 11, 0.85)); }
+      }
+      .preloader-title {
+        font-size: 24px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 50%, #D97706 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+        letter-spacing: -0.5px;
+      }
+      .preloader-spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(245, 158, 11, 0.15);
+        border-top-color: #F59E0B;
+        border-radius: 50%;
+        animation: spin 0.75s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      .preloader-sub {
+        margin-top: 14px;
+        font-size: 12px;
+        color: #9CA3AF;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+      }
+    </style>
+  </head>
+  <body class="bg-[#FAFAFA] dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-indigo-600 selection:text-white min-h-screen">
+    <!-- Instant Pre-React Loading Screen -->
+    <div id="app-preloader">
+      <svg class="preloader-crown" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M112 368h288l32-192-80 64-96-128-96 128-80-64z" fill="url(#pGrad)"/>
+        <circle cx="112" cy="176" r="16" fill="#FBBF24"/>
+        <circle cx="256" cy="112" r="20" fill="#FBBF24"/>
+        <circle cx="400" cy="176" r="16" fill="#FBBF24"/>
+        <rect x="112" y="384" width="288" height="24" rx="12" fill="url(#pGrad)"/>
+        <defs>
+          <linearGradient id="pGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FBBF24"/>
+            <stop offset="100%" stop-color="#D97706"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="preloader-title">Locket Gold</div>
+      <div class="preloader-spinner"></div>
+      <div class="preloader-sub">Đang tải tài nguyên hệ thống...</div>
+    </div>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

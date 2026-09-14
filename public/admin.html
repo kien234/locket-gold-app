@@ -1,0 +1,3325 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SB Admin 👑 Quản Lý Hệ Thống Locket Gold Pro</title>
+  <link rel="icon" id="admin-favicon" href="/favicon.svg" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fffbebeb',
+              100: '#fef3c7',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+              900: '#78350f',
+            },
+            sb: {
+              bg: '#0b0f19',
+              card: '#111827',
+              cardHover: '#161f32',
+              sidebar: '#0d1322',
+              border: 'rgba(255, 255, 255, 0.08)',
+              borderHover: 'rgba(255, 255, 255, 0.16)',
+            }
+          },
+          fontFamily: {
+            sans: ['Be Vietnam Pro', 'Outfit', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0B0F19;
+      --bg-card: #111827;
+      --bg-sidebar: #0D1322;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-color-hover: rgba(255, 255, 255, 0.16);
+      --text-primary: #F9FAFB;
+      --text-secondary: #9CA3AF;
+      --primary-accent: #F59E0B;
+    }
+    body {
+      font-family: 'Be Vietnam Pro', 'Outfit', system-ui, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      caret-color: #F59E0B;
+      font-variant-numeric: tabular-nums;
+      -webkit-tap-highlight-color: transparent;
+    }
+    ::selection {
+      background-color: #F59E0B;
+      color: #111827;
+    }
+    /* SB Admin Layout Architecture */
+    .sb-layout {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+    .sb-sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+    }
+    .sb-content-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    /* Collapsed Sidebar Mode */
+    .sb-collapsed .sb-sidebar {
+      margin-left: -260px;
+    }
+    @media (min-width: 1024px) {
+      .sb-collapsed .sb-sidebar {
+        margin-left: 0;
+        width: 80px;
+      }
+      .sb-collapsed .sb-sidebar .sb-nav-text,
+      .sb-collapsed .sb-sidebar .sb-nav-heading,
+      .sb-collapsed .sb-sidebar .sb-user-details {
+        display: none !important;
+      }
+      .sb-collapsed .sb-sidebar .sb-nav-link {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .sb-collapsed .sb-sidebar .sb-brand-name {
+        display: none;
+      }
+    }
+    /* Mobile Overlay */
+    @media (max-width: 1023px) {
+      .sb-sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+      .sb-sidebar-hidden {
+        transform: translateX(-100%);
+      }
+    }
+    /* SB Cards */
+    .sb-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+    .sb-card-interactive:hover {
+      border-color: var(--border-color-hover);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 99px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(245, 158, 11, 0.5);
+    }
+    /* Form controls */
+    input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible {
+      outline: 2px solid #F59E0B;
+      outline-offset: 2px;
+    }
+    .sb-input {
+      background-color: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      color: #F9FAFB;
+      transition: all 150ms ease;
+    }
+    .sb-input:focus {
+      border-color: #F59E0B;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+      outline: none;
+    }
+    /* Custom Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    /* Mobile Bottom Nav Padding */
+    @media (max-width: 767px) {
+      .pb-mobile-nav {
+        padding-bottom: 5rem !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#0B0F19] text-[#F9FAFB] min-h-screen selection:bg-amber-500 selection:text-amber-950 pb-mobile-nav">
+
+  <!-- Ambient Light Orbs -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-40 left-1/4 w-[700px] h-[700px] bg-amber-600/8 rounded-full blur-[200px]"></div>
+    <div class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-indigo-700/8 rounded-full blur-[180px]"></div>
+  </div>
+
+  <!-- Mobile Backdrop Overlay -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/70 backdrop-blur-xs z-30 hidden lg:hidden transition-opacity"></div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 transform transition-all duration-300 translate-y-10 opacity-0 pointer-events-none max-w-sm w-full px-4 sm:px-0">
+    <div id="toast-body" class="px-4 py-3 rounded-2xl bg-[#161B26]/95 backdrop-blur-xl text-white font-bold text-xs shadow-2xl border border-amber-500/30 flex items-center gap-3">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+      <span id="toast-text">Thông báo...</span>
+    </div>
+  </div>
+
+  <!-- ── 1. LOGIN SCREEN ── -->
+  <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 relative z-10">
+    <div class="w-full max-w-md sb-card p-6 sm:p-8 space-y-6 shadow-2xl border-amber-500/20">
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 text-amber-950 font-black flex items-center justify-center text-2xl mx-auto shadow-xl shadow-amber-500/25">
+          👑
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center justify-center gap-2">
+            <span>SB ADMIN</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+          </h1>
+          <p class="text-xs text-slate-400 font-medium mt-1">Hệ Thống Quản Lý CTV & Nâng Cấp Locket Gold</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-extrabold text-slate-300 mb-1.5 uppercase tracking-wider">Tên Đăng Nhập Admin</label>
+          <input type="text" id="login-user" placeholder="admin" required class="w-full px-4 py-3.5 sb-input text-sm font-bold" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-extrabold text-slate-300 mb-1.5 uppercase tracking-wider">Mật Khẩu</label>
+          <input type="password" id="login-pass" placeholder="••••••••" required class="w-full px-4 py-3.5 sb-input text-sm font-bold" />
+        </div>
+
+        <button type="submit" id="login-btn" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:opacity-95 text-amber-950 font-black text-sm shadow-xl shadow-amber-500/20 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2">
+          <span>Đăng Nhập Quản Trị</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── 2. DASHBOARD MAIN VIEW (SB ADMIN LAYOUT) ── -->
+  <div id="dashboard" class="hidden min-h-screen relative z-10">
+    <div class="sb-layout">
+
+      <!-- ── SIDEBAR NAVIGATION ── -->
+      <aside id="sidebar" class="sb-sidebar sb-sidebar-hidden lg:transform-none">
+        
+        <!-- Sidebar Brand Header -->
+        <div class="h-16 px-5 flex items-center justify-between border-b border-white/[0.08] shrink-0">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 text-amber-950 font-black flex items-center justify-center text-lg shadow-md shrink-0">
+              👑
+            </div>
+            <div class="sb-brand-name font-black text-sm tracking-wide text-white whitespace-nowrap">
+              <span>SB ADMIN</span>
+              <span class="text-amber-500 text-xs block font-bold">Locket Gold</span>
+            </div>
+          </div>
+          <button type="button" onclick="toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1">
+            ✕
+          </button>
+        </div>
+
+        <!-- Sidebar Navigation Menu -->
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6 text-xs font-semibold">
+          
+          <!-- Category 1: Overview -->
+          <div class="space-y-1">
+            <div class="sb-nav-heading px-3 text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">TỔNG QUAN</div>
+            
+            <a href="javascript:void(0)" id="nav-tab-dashboard" onclick="switchTab('tab-dashboard')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-amber-400 bg-amber-500/10 font-bold border border-amber-500/20">
+              <span class="text-base shrink-0">📊</span>
+              <span class="sb-nav-text truncate">Bảng Điều Khiển</span>
+            </a>
+          </div>
+
+          <!-- Category 2: Sales & Orders -->
+          <div class="space-y-1">
+            <div class="sb-nav-heading px-3 text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">QUẢN LÝ BÁN HÀNG</div>
+
+            <a href="javascript:void(0)" id="nav-tab-ctv" onclick="switchTab('tab-ctv')" class="sb-nav-link flex items-center justify-between px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <div class="flex items-center gap-3 truncate">
+                <span class="text-base shrink-0">👥</span>
+                <span class="sb-nav-text truncate">Cộng Tác Viên (CTV)</span>
+              </div>
+              <span id="nav-count-ctv" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 font-mono">0</span>
+            </a>
+
+            <a href="javascript:void(0)" id="nav-tab-ctv-orders" onclick="switchTab('tab-ctv-orders')" class="sb-nav-link flex items-center justify-between px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <div class="flex items-center gap-3 truncate">
+                <span class="text-base shrink-0">📦</span>
+                <span class="sb-nav-text truncate">Lịch Sử Đơn CTV</span>
+              </div>
+              <span id="nav-count-orders" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 font-mono">0</span>
+            </a>
+
+            <!-- NEW: Retail Public Orders Link -->
+            <a href="javascript:void(0)" id="nav-tab-public-orders" onclick="switchTab('tab-public-orders')" class="sb-nav-link flex items-center justify-between px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <div class="flex items-center gap-3 truncate">
+                <span class="text-base shrink-0">🛒</span>
+                <span class="sb-nav-text truncate">Đơn Web Chính (Khách Lẻ)</span>
+              </div>
+              <span id="nav-count-public-orders" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 font-mono">0</span>
+            </a>
+          </div>
+
+          <!-- Category 3: Integrations & Payments -->
+          <div class="space-y-1">
+            <div class="sb-nav-heading px-3 text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">TÍCH HỢP & THANH TOÁN</div>
+
+            <a href="javascript:void(0)" id="nav-tab-upstream" onclick="switchTab('tab-upstream')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">🌐</span>
+              <span class="sb-nav-text truncate">Web Mẹ (Upstream API)</span>
+            </a>
+
+            <a href="javascript:void(0)" id="nav-tab-sepay" onclick="switchTab('tab-sepay')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">💳</span>
+              <span class="sb-nav-text truncate">SePay Webhook VietQR</span>
+            </a>
+
+            <a href="javascript:void(0)" id="nav-tab-telegram" onclick="switchTab('tab-telegram')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">🤖</span>
+              <span class="sb-nav-text truncate">Telegram Bot Auto</span>
+            </a>
+          </div>
+
+          <!-- Category 4: System & Store Settings -->
+          <div class="space-y-1">
+            <div class="sb-nav-heading px-3 text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">HỆ THỐNG & TRANG CHỦ</div>
+
+            <a href="javascript:void(0)" id="nav-tab-wholesale-prices" onclick="switchTab('tab-wholesale-prices')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">🏷️</span>
+              <span class="sb-nav-text truncate">Bảng Giá Sỉ Mặc Định</span>
+            </a>
+
+            <a href="javascript:void(0)" id="nav-tab-retail-packages" onclick="switchTab('tab-retail-packages')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">✨</span>
+              <span class="sb-nav-text truncate">Gói Khách Lẻ Trang Chủ</span>
+            </a>
+
+            <a href="javascript:void(0)" id="nav-tab-brand" onclick="switchTab('tab-brand')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">🎨</span>
+              <span class="sb-nav-text truncate">Thương Hiệu & Logo</span>
+            </a>
+
+            <a href="javascript:void(0)" id="nav-tab-notice" onclick="switchTab('tab-notice')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">📢</span>
+              <span class="sb-nav-text truncate">Popup Thông Báo</span>
+            </a>
+
+            <a href="javascript:void(0)" id="nav-tab-faqs" onclick="switchTab('tab-faqs')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">❓</span>
+              <span class="sb-nav-text truncate">FAQ Trợ Giúp</span>
+            </a>
+
+            <a href="javascript:void(0)" id="nav-tab-contact" onclick="switchTab('tab-contact')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">📞</span>
+              <span class="sb-nav-text truncate">Liên Hệ Hỗ Trợ 24/7</span>
+            </a>
+
+            <a href="javascript:void(0)" id="nav-tab-admin-creds" onclick="switchTab('tab-admin-creds')" class="sb-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white">
+              <span class="text-base shrink-0">🔐</span>
+              <span class="sb-nav-text truncate">Đổi Tài Khoản Admin</span>
+            </a>
+          </div>
+
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="p-3 border-t border-white/[0.08] shrink-0 bg-black/20">
+          <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/5 border border-white/5">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-xs shrink-0">
+                AD
+              </div>
+              <div class="sb-user-details truncate">
+                <div class="font-bold text-xs text-white truncate" id="sidebar-admin-user">admin</div>
+                <div class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online
+                </div>
+              </div>
+            </div>
+
+            <button type="button" onclick="handleLogout()" title="Đăng Xuất Admin" class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all cursor-pointer shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ── MAIN CONTENT WRAPPER ── -->
+      <div class="sb-content-wrapper">
+
+        <!-- ── HEADER TOPBAR ── -->
+        <header class="sticky top-0 z-30 h-16 bg-[#0B0F19]/80 backdrop-blur-xl border-b border-white/[0.08] px-4 sm:px-6 flex items-center justify-between gap-4">
+          
+          <div class="flex items-center gap-3">
+            <!-- Sidebar Toggle Button -->
+            <button type="button" id="sidebarToggle" onclick="toggleSidebar()" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-all cursor-pointer">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+
+            <!-- Page Title Breadcrumbs -->
+            <div>
+              <div class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                <span>SB Admin</span>
+                <span>/</span>
+                <span id="topbar-breadcrumb" class="text-amber-400 font-extrabold">Bảng Điều Khiển</span>
+              </div>
+              <h2 id="topbar-title" class="text-base font-black text-white leading-tight">Quản Lý Locket Gold Pro</h2>
+            </div>
+          </div>
+
+          <!-- Topbar Controls -->
+          <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Quick Upstream Info Pill -->
+            <div id="topbar-upstream-pill" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs font-bold text-amber-400">
+              <span>🌐 Ví Web Mẹ:</span>
+              <span id="topbar-upstream-balance" class="font-mono text-emerald-400 font-extrabold">--</span>
+            </div>
+
+            <!-- Refresh Data Button -->
+            <button type="button" id="btn-refresh-admin" onclick="loadAdminData(true)" title="Cập nhật dữ liệu mới nhất" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95">
+              <svg id="icon-refresh-admin" class="w-3.5 h-3.5 text-amber-400 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span class="hidden sm:inline">Làm Mới Dữ Liệu</span>
+            </button>
+
+            <!-- Quick Logout Button -->
+            <button type="button" onclick="handleLogout()" class="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-bold transition-all cursor-pointer flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+              <span class="hidden sm:inline">Đăng Xuất</span>
+            </button>
+          </div>
+
+        </header>
+
+        <!-- ── MAIN PAGE BODY CONTENT ── -->
+        <main class="flex-1 p-4 sm:p-6 space-y-6 max-w-7xl w-full mx-auto">
+          
+          <!-- ── STAT OVERVIEW KPI CARDS ── -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            
+            <!-- Card 1: CTV Count -->
+            <div class="sb-card p-4 border-t-2 border-t-amber-500 flex items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Tổng Số CTV</div>
+                <div id="stat-ctv-count" class="text-2xl font-black text-white font-mono">0</div>
+                <div class="text-[10px] text-amber-400 font-bold truncate">👥 Đại Lý Hoạt Động</div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-lg font-bold shrink-0">
+                👥
+              </div>
+            </div>
+
+            <!-- Card 2: Total CTV Balance -->
+            <div class="sb-card p-4 border-t-2 border-t-amber-400 flex items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Tổng Số Dư Ví CTV</div>
+                <div id="stat-ctv-balance-total" class="text-xl font-black text-amber-400 font-mono">0đ</div>
+                <div class="text-[10px] text-slate-400 font-semibold truncate">💰 Ví CTV Hệ Thống</div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-lg font-bold shrink-0">
+                💰
+              </div>
+            </div>
+
+            <!-- Card 3: CTV Completed Orders -->
+            <div class="sb-card p-4 border-t-2 border-t-emerald-500 flex items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Đơn CTV Hoàn Thành</div>
+                <div id="stat-orders-completed" class="text-2xl font-black text-emerald-400 font-mono">0</div>
+                <div class="text-[10px] text-emerald-400 font-bold truncate">⚡ Đơn Đại Lý Đấu Nối</div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg font-bold shrink-0">
+                ⚡
+              </div>
+            </div>
+
+            <!-- Card 4: NEW Public Retail Orders -->
+            <div class="sb-card p-4 border-t-2 border-t-yellow-400 flex items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Đơn Web Chính (Khách Lẻ)</div>
+                <div id="stat-public-orders-total" class="text-2xl font-black text-yellow-400 font-mono">0</div>
+                <div id="stat-public-revenue-total" class="text-[10px] text-emerald-400 font-bold truncate">Doanh thu: 0đ</div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 flex items-center justify-center text-lg font-bold shrink-0">
+                🛒
+              </div>
+            </div>
+
+            <!-- Card 5: Mother Site Upstream Wallet -->
+            <div class="sb-card p-4 border-t-2 border-t-amber-500/80 flex items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Số Dư Web Mẹ</div>
+                <div id="stat-upstream-balance-quick" class="text-xl font-black text-amber-300 font-mono">--</div>
+                <div id="stat-upstream-requests-quick" class="text-[10px] text-slate-400 font-bold truncate">🌐 locketgold.click</div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-lg font-bold shrink-0">
+                🌐
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── TAB DASHBOARD: QUICK OVERVIEW ── -->
+          <div id="tab-dashboard" class="tab-content space-y-6 animate-fade-in">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Left 2 Cols: Quick Actions & Overview -->
+              <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Welcome Banner -->
+                <div class="sb-card p-6 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-indigo-500/10 border border-amber-500/20 relative overflow-hidden">
+                  <div class="space-y-2 relative z-10">
+                    <span class="px-3 py-1 rounded-full text-[10px] font-black bg-amber-500 text-amber-950 uppercase tracking-wider">SB Admin Pro</span>
+                    <h3 class="text-xl font-black text-white">Hệ Thống Quản Lý Độc Quyền Locket Gold</h3>
+                    <p class="text-xs text-slate-300 max-w-xl leading-relaxed">
+                      Quản lý đơn hàng nâng cấp Gold (Khách Lẻ & CTV), tự động hóa quy trình kích hoạt Locket Gold 24/7 qua Web Mẹ, tích hợp SePay Webhook VietQR tự động và Telegram Bot thông báo tức thì.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Quick Navigation Action Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div onclick="switchTab('tab-public-orders')" class="sb-card p-5 sb-card-interactive cursor-pointer space-y-3 group border-amber-500/30">
+                    <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-400 font-bold flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                      🛒
+                    </div>
+                    <div>
+                      <h4 class="font-black text-sm text-white group-hover:text-yellow-400 transition-colors">Đơn Web Chính (Khách Lẻ)</h4>
+                      <p class="text-xs text-slate-400 mt-0.5">Xem đơn khách lẻ trực tiếp trên trang chủ & kích hoạt Gold thủ công.</p>
+                    </div>
+                  </div>
+
+                  <div onclick="switchTab('tab-ctv-orders')" class="sb-card p-5 sb-card-interactive cursor-pointer space-y-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                      📦
+                    </div>
+                    <div>
+                      <h4 class="font-black text-sm text-white group-hover:text-emerald-400 transition-colors">Lịch Sử Đơn CTV</h4>
+                      <p class="text-xs text-slate-400 mt-0.5">Xem chi tiết đơn nâng cấp Gold thực hiện bởi từng CTV.</p>
+                    </div>
+                  </div>
+
+                  <div onclick="switchTab('tab-sepay')" class="sb-card p-5 sb-card-interactive cursor-pointer space-y-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 font-bold flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                      💳
+                    </div>
+                    <div>
+                      <h4 class="font-black text-sm text-white group-hover:text-indigo-400 transition-colors">Cấu Hình SePay VietQR</h4>
+                      <p class="text-xs text-slate-400 mt-0.5">Thiết lập Webhook auto cộng tiền và kiểm tra lịch sử ngân hàng.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Recent Public Retail Orders Feed -->
+                <div class="sb-card p-5 space-y-4">
+                  <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                    <h4 class="font-black text-sm text-white flex items-center gap-2">
+                      <span>🛒 Đơn Nâng Cấp Gold Mới Nhất Trên Trang Chủ</span>
+                    </h4>
+                    <button onclick="switchTab('tab-public-orders')" class="text-xs font-bold text-amber-400 hover:underline cursor-pointer">
+                      Xem Tất Cả Đơn Web Chính ➔
+                    </button>
+                  </div>
+                  <div id="dash-recent-public-orders" class="space-y-2">
+                    <div class="p-6 text-center text-slate-500 text-xs">Đang tải danh sách đơn hàng...</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Right 1 Col: Mother Site Live Status Box -->
+              <div class="space-y-6">
+                <div class="sb-card p-6 border-amber-500/30 space-y-4">
+                  <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                    <h4 class="font-black text-sm text-white flex items-center gap-2">
+                      <span>🌐 Trạng Thái Web Mẹ</span>
+                    </h4>
+                    <span id="dash-upstream-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-slate-400">Đang kiểm tra...</span>
+                  </div>
+
+                  <div class="space-y-3 text-xs">
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-400">Tài khoản CTV Web Mẹ:</span>
+                      <span id="dash-upstream-user" class="font-mono font-bold text-amber-400">--</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-400">Số dư ví Web Mẹ:</span>
+                      <span id="dash-upstream-balance" class="font-mono font-black text-emerald-400">--</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-400">Lượt gói còn lại:</span>
+                      <span id="dash-upstream-requests" class="font-mono font-bold text-amber-400">--</span>
+                    </div>
+                  </div>
+
+                  <button type="button" onclick="switchTab('tab-upstream')" class="w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-xs font-bold transition-all cursor-pointer">
+                    ⚙️ Cấu Hình API Key Web Mẹ
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ── TAB 1: CTV ACCOUNTS MANAGEMENT ── -->
+          <div id="tab-ctv" class="tab-content hidden space-y-6 animate-fade-in">
+            
+            <!-- Create New CTV Form Card -->
+            <div class="sb-card p-5 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                <h3 class="text-base font-black text-white flex items-center gap-2">
+                  <span>➕ Tạo Tài Khoản Cộng Tác Viên Mới</span>
+                </h3>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">Cấp Quyền CTV</span>
+              </div>
+
+              <form onsubmit="handleCreateCtv(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Username CTV *</label>
+                    <input type="text" id="ctv-user-in" placeholder="VD: ctv_linh" required class="w-full px-3.5 py-3 sb-input text-xs font-bold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Mật Khẩu CTV *</label>
+                    <input type="text" id="ctv-pass-in" placeholder="VD: 123456" required class="w-full px-3.5 py-3 sb-input text-xs font-bold" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Giá Gói 1 Năm Cho CTV (VNĐ)</label>
+                    <input type="number" id="ctv-p1y-in" placeholder="65000" class="w-full px-3.5 py-3 sb-input text-emerald-400 font-mono text-xs font-bold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Giá Gói Vĩnh Viễn Cho CTV (VNĐ)</label>
+                    <input type="number" id="ctv-plt-in" placeholder="350000" class="w-full px-3.5 py-3 sb-input text-amber-400 font-mono text-xs font-bold" />
+                  </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:opacity-95 text-amber-950 font-black text-xs shadow-md shadow-amber-500/20 active:scale-[0.99] transition-all cursor-pointer">
+                  ➕ Tạo Tài Khoản CTV Mới
+                </button>
+              </form>
+            </div>
+
+            <!-- List CTV Accounts Container -->
+            <div class="sb-card p-5 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-white/[0.08]">
+                <div>
+                  <h3 class="text-base font-black text-white flex items-center gap-2">
+                    <span>👥 Danh Sách Cộng Tác Viên</span>
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Quản lý số dư ví, đổi mật khẩu và API Key cho từng CTV</p>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+                  <div class="flex bg-black/40 p-1 rounded-xl border border-white/10 text-xs font-bold">
+                    <button type="button" id="btn-view-cards" onclick="setCtvViewMode('cards')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-amber-950 shadow-xs transition-all cursor-pointer">🎴 Thẻ (Mobile)</button>
+                    <button type="button" id="btn-view-table" onclick="setCtvViewMode('table')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer">📋 Bảng (Desktop)</button>
+                  </div>
+
+                  <input type="text" id="ctv-search" oninput="renderCtvAccounts()" placeholder="🔍 Tìm Username CTV..." class="px-3.5 py-2 rounded-xl sb-input text-xs font-bold text-white flex-1 sm:w-56" />
+                </div>
+              </div>
+
+              <!-- Cards View Container (Default for Mobile) -->
+              <div id="container-ctv-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-8 text-center text-slate-500 text-xs col-span-full">Đang tải danh sách CTV...</div>
+              </div>
+
+              <!-- Table View Container (Desktop Option) -->
+              <div id="container-ctv-table" class="hidden overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-black/50 text-amber-400 font-black uppercase text-[11px] border-b border-white/10">
+                    <tr>
+                      <th class="p-4">STT / CTV Username</th>
+                      <th class="p-4">Mật Khẩu</th>
+                      <th class="p-4">Giá Gói 1 Năm</th>
+                      <th class="p-4">Giá Vĩnh Viễn</th>
+                      <th class="p-4">Số Dư Ví CTV</th>
+                      <th class="p-4">API Key Đấu Nối</th>
+                      <th class="p-4">Telegram Chat ID</th>
+                      <th class="p-4 text-right">Thao Tác Quản Lý</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-ctv-accounts" class="divide-y divide-white/5 font-semibold">
+                    <tr><td colspan="8" class="p-4 text-center text-slate-500">Đang tải dữ liệu CTV...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+
+          <!-- ── TAB 2: CTV ORDERS LOG ── -->
+          <div id="tab-ctv-orders" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-5">
+              <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-white/[0.08]">
+                <div>
+                  <h3 class="text-base font-black text-white flex items-center gap-2">
+                    <span>📦 Lịch Sử Nâng Cấp Gold CTV</span>
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Theo dõi lịch sử đơn nâng cấp Gold thực hiện bởi CTV</p>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+                  <div class="flex bg-black/40 p-1 rounded-xl border border-white/10 text-xs font-bold">
+                    <button type="button" id="btn-mode-grouped" onclick="setOrderViewMode('grouped')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-amber-950 shadow-xs transition-all cursor-pointer">👥 Nhóm Theo CTV</button>
+                    <button type="button" id="btn-mode-flat" onclick="setOrderViewMode('flat')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer">📋 Tất Cả Đơn</button>
+                  </div>
+
+                  <input type="text" id="ctv-order-search" oninput="renderCtvOrders()" placeholder="🔍 Tìm Mã đơn / CTV / Khách..." class="px-3.5 py-2 rounded-xl sb-input text-xs font-bold text-white flex-1 sm:w-64" />
+                </div>
+              </div>
+
+              <!-- Grouped CTV Cards Container -->
+              <div id="container-ctv-orders-grouped" class="space-y-4">
+                <div class="p-8 text-center text-slate-500 text-xs">Đang tải lịch sử giao dịch CTV...</div>
+              </div>
+
+              <!-- Flat Table Container -->
+              <div id="container-ctv-orders-flat" class="hidden overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-black/50 text-amber-400 font-black uppercase text-[11px] border-b border-white/10">
+                    <tr>
+                      <th class="p-4">Mã Giao Dịch</th>
+                      <th class="p-4">CTV Thực Hiện</th>
+                      <th class="p-4">User Được Nâng Cấp</th>
+                      <th class="p-4">Gói Gold</th>
+                      <th class="p-4">Số Tiền Trừ Ví</th>
+                      <th class="p-4">Thời Gian</th>
+                      <th class="p-4 text-center">Xóa</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-ctv-orders" class="divide-y divide-white/5 font-semibold">
+                    <tr><td colspan="7" class="p-4 text-center text-slate-500">Đang tải...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- ── NEW TAB: PUBLIC RETAIL ORDERS LOG (WEB CHÍNH) ── -->
+          <div id="tab-public-orders" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-5 border-amber-500/30">
+              <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-white/[0.08]">
+                <div>
+                  <h3 class="text-base font-black text-white flex items-center gap-2">
+                    <span>🛒 Lịch Sử Đơn Hàng Web Chính (Khách Lẻ)</span>
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Theo dõi & kích hoạt Gold cho các đơn đặt trực tiếp của khách hàng trên trang chủ</p>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+                  <button type="button" onclick="handleCleanupExpiredOrders()" class="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold text-xs border border-amber-500/20 transition-all cursor-pointer flex items-center gap-1">
+                    🧹 Xóa Đơn Hết Hạn
+                  </button>
+                  <button type="button" onclick="handleDeleteAllPublicOrders()" class="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold text-xs border border-rose-500/20 transition-all cursor-pointer flex items-center gap-1">
+                    🗑️ Xóa Tất Cả
+                  </button>
+                </div>
+              </div>
+
+              <!-- Filter & Search Control Bar -->
+              <div class="flex items-center justify-between flex-wrap gap-3">
+                <div class="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10 text-xs font-bold overflow-x-auto">
+                  <button type="button" id="btn-pfilter-all" onclick="setPublicOrderFilter('ALL')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-amber-950 shadow-xs transition-all cursor-pointer">Tất Cả</button>
+                  <button type="button" id="btn-pfilter-completed" onclick="setPublicOrderFilter('COMPLETED')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer">🟢 Hoàn Thành</button>
+                  <button type="button" id="btn-pfilter-pending" onclick="setPublicOrderFilter('PENDING')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer">⏳ Chờ Thanh Toán</button>
+                  <button type="button" id="btn-pfilter-expired" onclick="setPublicOrderFilter('EXPIRED')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer">🔴 Hết Hạn</button>
+                </div>
+
+                <div class="flex items-center gap-2 flex-1 sm:w-72">
+                  <input type="text" id="public-order-search" oninput="renderPublicOrders()" placeholder="🔍 Tìm Username / UID / Mã đơn..." class="w-full px-3.5 py-2 rounded-xl sb-input text-xs font-bold text-white" />
+                </div>
+              </div>
+
+              <!-- Orders Table Container -->
+              <div id="container-public-orders-table" class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-black/50 text-amber-400 font-black uppercase text-[11px] border-b border-white/10">
+                    <tr>
+                      <th class="p-3.5">Mã Đơn / UID</th>
+                      <th class="p-3.5">Username Locket</th>
+                      <th class="p-3.5">Gói Gold</th>
+                      <th class="p-3.5">Số Tiền</th>
+                      <th class="p-3.5">Nội Dung CK</th>
+                      <th class="p-3.5">Trạng Thái</th>
+                      <th class="p-3.5">Thời Gian</th>
+                      <th class="p-3.5 text-right">Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-public-orders" class="divide-y divide-white/5 font-semibold">
+                    <tr><td colspan="8" class="p-4 text-center text-slate-500">Đang tải lịch sử đơn web chính...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+
+
+          <!-- ── TAB 3: UPSTREAM MOTHER SITE ── -->
+          <div id="tab-upstream" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-4 border-amber-500/30">
+              <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/[0.08]">
+                <h3 class="text-base font-black text-white flex items-center gap-2">
+                  🌐 Cấu Hình API Key Web Mẹ (locketgold.click)
+                </h3>
+                <span id="upstream-badge-status" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-slate-400">Đang kiểm tra...</span>
+              </div>
+              
+              <form onsubmit="handleSaveUpstreamKey(event)" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1.5">Upstream API Key (Key CTV của bạn trên Web Mẹ) *</label>
+                  <input type="text" id="cfg-upstream-key" placeholder="VD: ctv_key_..." class="w-full px-4 py-3 sb-input text-amber-400 text-xs font-mono font-bold" />
+                </div>
+
+                <!-- Live Upstream Status Box -->
+                <div id="upstream-live-info" class="hidden p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-400 font-medium">Tài khoản CTV Web Mẹ:</span>
+                    <span id="upstream-ctv-user" class="font-bold text-amber-400 font-mono">--</span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-400 font-medium">Số dư ví trên Web Mẹ:</span>
+                    <span id="upstream-ctv-balance" class="font-bold text-emerald-400 font-mono">--</span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-400 font-medium">Lượt gói còn lại trên Web Mẹ:</span>
+                    <span id="upstream-ctv-requests" class="font-bold text-amber-400 font-mono">--</span>
+                  </div>
+                </div>
+
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Mọi yêu cầu nâng cấp Gold trên website này sẽ được chuyển tiếp sang máy chủ <code class="text-amber-400 font-mono font-bold">https://locketgold.click</code> kèm API Key này để tự động trừ tiền trong ví CTV của bạn trên Web Mẹ.
+                </p>
+                <div class="flex gap-2">
+                  <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-amber-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer">
+                    💾 Lưu API Key Web Mẹ
+                  </button>
+                  <button type="button" onclick="loadUpstreamInfo(true)" class="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-xs transition-all cursor-pointer">
+                    🔄 Kiểm Tra
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- ── TAB 4: SEPAY WEBHOOK & BANK ── -->
+          <!-- ── TAB 4: SEPAY WEBHOOK & BANK ── -->
+          <div id="tab-sepay" class="tab-content hidden space-y-6 animate-fade-in">
+            
+            <!-- Quick Setup Guide Card -->
+            <div class="sb-card p-5 sm:p-6 space-y-5 border-emerald-500/30">
+              <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/[0.08]">
+                <div>
+                  <h3 class="text-base font-black text-white flex items-center gap-2">
+                    💳 Cấu Hình SePay Webhook Tự Động (0s Instant Deposit)
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Tự động nhận diện thanh toán VietQR ngân hàng, duyệt đơn Locket Gold & nạp ví CTV ngay lập tức.</p>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">⚡ Auto 24/7</span>
+              </div>
+
+              <!-- 3-Step Visual Setup Guide -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-2 relative overflow-hidden">
+                  <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 font-black text-xs flex items-center justify-center">1</div>
+                  <div class="font-extrabold text-white text-xs">Sao Chép URL Webhook</div>
+                  <p class="text-[11px] text-slate-400 leading-relaxed">Copy đường dẫn Webhook bên dưới để dán vào cấu hình SePay.</p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-2 relative overflow-hidden">
+                  <div class="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-400 font-black text-xs flex items-center justify-center">2</div>
+                  <div class="font-extrabold text-white text-xs">Cài Đặt Trên SePay.vn</div>
+                  <p class="text-[11px] text-slate-400 leading-relaxed">Vào SePay > Webhook > Thêm Webhook mới, chọn phương thức <b>POST</b> và kiểu <b>JSON</b>.</p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-2 relative overflow-hidden">
+                  <div class="w-7 h-7 rounded-xl bg-indigo-500/20 text-indigo-400 font-black text-xs flex items-center justify-center">3</div>
+                  <div class="font-extrabold text-white text-xs">Lưu Thông Tin Ngân Hàng</div>
+                  <p class="text-[11px] text-slate-400 leading-relaxed">Nhập đúng STK & Tên Ngân hàng bên dưới để tạo mã VietQR tự động.</p>
+                </div>
+              </div>
+
+              <!-- Webhook URL Box with 1-Click Copy -->
+              <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-2.5">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <label class="block text-xs font-black text-emerald-400">🔗 Đường Dẫn Webhook Nhận Biến Động Số Dư:</label>
+                  <a href="https://my.sepay.vn/integrations/webhooks" target="_blank" rel="noreferrer" class="text-[11px] font-bold text-amber-400 hover:underline flex items-center gap-1">
+                    <span>Mở trang SePay Webhooks</span> ↗
+                  </a>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input type="text" id="cfg-sepay-webhook-url" readonly class="w-full px-3.5 py-3 rounded-xl sb-input text-emerald-300 font-mono text-xs font-bold select-all bg-black/60 border-emerald-500/40" />
+                  <button type="button" onclick="copySepayWebhookUrl()" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs whitespace-nowrap transition-all cursor-pointer shadow-md shadow-emerald-600/20 flex items-center gap-1.5 active:scale-95">
+                    📋 Sao Chép
+                  </button>
+                </div>
+                <p class="text-[11px] text-slate-400">💡 <i>Hệ thống tự động hỗ trợ tất cả các đường dẫn Webhook chuẩn (kèm hoặc không kèm Secret Token).</i></p>
+              </div>
+
+              <!-- Bank Config Form -->
+              <form onsubmit="handleSaveSepayConfig(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Số Tài Khoản Ngân Hàng *</label>
+                    <input type="text" id="cfg-sepay-account-no" placeholder="VD: 21456181" required class="w-full px-4 py-3 sb-input text-white text-xs font-mono font-bold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Ngân Hàng (Mã Ngắn) *</label>
+                    <input type="text" id="cfg-sepay-bank-brand" placeholder="VD: ACB, VCB, MBBank, Techcombank" required class="w-full px-4 py-3 sb-input text-white text-xs font-bold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Tên Chủ Tài Khoản *</label>
+                    <input type="text" id="cfg-sepay-account-name" placeholder="VD: NGUYEN VAN KIEN" required class="w-full px-4 py-3 sb-input text-white text-xs font-bold" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Webhook Secret Key (Tùy chọn - Bảo mật thêm)</label>
+                    <input type="text" id="cfg-sepay-secret" placeholder="Để trống nếu không cài Secret trên SePay" class="w-full px-4 py-3 sb-input text-white text-xs font-mono font-bold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">SePay API Key (Dùng để quét sao kê / test)</label>
+                    <input type="text" id="cfg-sepay-api-key" placeholder="VD: SPH-..." class="w-full px-4 py-3 sb-input text-white text-xs font-mono font-bold" />
+                  </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-95 text-white font-black text-xs shadow-md shadow-emerald-500/20 transition-all cursor-pointer">
+                  💾 Lưu Cấu Hình Ngân Hàng & SePay
+                </button>
+              </form>
+
+              <!-- DIAGNOSTICS & TESTING TOOLS -->
+              <div class="border-t border-white/10 pt-5 space-y-4">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <h4 class="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🧪 Bộ Công Cụ Test Nhanh SePay Webhook</span>
+                  </h4>
+                </div>
+
+                <!-- Simulation Tool 1: Pipeline Tester -->
+                <div class="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+                  <div class="font-bold text-xs text-slate-200">1. Chạy Test Giả Lập Biến Động Số Dư (Không cần chuyển tiền thật):</div>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input type="number" id="test-sepay-sim-amount" value="50000" placeholder="Số tiền (VD: 50000)" class="px-3 py-2 sb-input text-xs font-mono font-bold text-white" />
+                    <input type="text" id="test-sepay-sim-memo" value="NAP_CTV" placeholder="Nội dung CK (VD: NAP_CTV hoặc LK123)" class="px-3 py-2 sb-input text-xs font-mono font-bold text-white" />
+                    <input type="text" id="test-sepay-sim-user" placeholder="Username CTV (nếu có)" class="px-3 py-2 sb-input text-xs font-bold text-white" />
+                  </div>
+                  <button type="button" onclick="handleRunSepayWebhookTest()" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs">
+                    ▶️ Chạy Thử Webhook Giả Lập
+                  </button>
+                  <div id="test-sepay-sim-result" class="hidden p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all"></div>
+                </div>
+
+                <!-- Diagnostics Tool 2: Fetch Live Bank Transactions -->
+                <div class="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+                  <div class="font-bold text-xs text-slate-200">2. Kiểm Tra Kết Nối SePay API (Lấy giao dịch thật từ ngân hàng):</div>
+                  <div class="flex gap-2">
+                    <button type="button" onclick="handleTestSepayTransactions(10)" class="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1">
+                      🔌 Lấy 10 GD Gần Nhất
+                    </button>
+                    <button type="button" onclick="handleTestSepayTransactions(30)" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs transition-all cursor-pointer">
+                      30 GD
+                    </button>
+                  </div>
+                  <div id="test-sepay-tx-result" class="hidden p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all"></div>
+                </div>
+              </div>
+
+              <!-- SEPAY WEBHOOK HISTORY LOGS TABLE -->
+              <div class="border-t border-white/10 pt-5 space-y-4">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h4 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                      <span>📜 Lịch Sử Nhận Webhook & Biến Động Số Dư SePay (Real-Time)</span>
+                    </h4>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Danh sách tất cả các biến động số dư ngân hàng được SePay gửi về hệ thống.</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button type="button" onclick="loadSepayLogs(true)" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                      <span id="sepay-logs-refresh-icon">🔄</span> Làm Mới
+                    </button>
+                    <button type="button" onclick="handleClearSepayLogs()" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
+                      🗑️ Xóa Lịch Sử
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="overflow-x-auto rounded-2xl border border-white/10 bg-black/40">
+                  <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-white/5 text-[11px] font-black uppercase text-slate-400 border-b border-white/10">
+                      <tr>
+                        <th class="px-4 py-3">Mã GD SePay</th>
+                        <th class="px-4 py-3">Thời Gian</th>
+                        <th class="px-4 py-3">Số Tiền</th>
+                        <th class="px-4 py-3">Nội Dung Chuyển Khoản</th>
+                        <th class="px-4 py-3">Phân Loại Khớp</th>
+                        <th class="px-4 py-3">Đối Tượng & Chi Tiết</th>
+                        <th class="px-4 py-3">Trạng Thái</th>
+                      </tr>
+                    </thead>
+                    <tbody id="sepay-logs-tbody" class="divide-y divide-white/5 font-mono text-[11px]">
+                      <tr>
+                        <td colspan="7" class="px-4 py-8 text-center text-slate-500 font-sans">
+                          ⏳ Đang tải lịch sử SePay Webhook...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+          <!-- ── TAB 5: TELEGRAM BOT ── -->
+          <div id="tab-telegram" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-4 border-indigo-500/30">
+              <h3 class="text-base font-black text-white flex items-center gap-2 pb-3 border-b border-white/[0.08]">
+                🤖 Cấu Hình Telegram Bot Thông Báo Tự Động 24/7
+              </h3>
+              <form onsubmit="handleSaveTelegramToken(event)" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1.5">Telegram Bot Token</label>
+                  <input type="text" id="cfg-telegram-token" placeholder="VD: 789123456:AA..." class="w-full px-4 py-3 sb-input text-white text-xs font-mono font-bold" />
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Bot Token này được hệ thống sử dụng để nhắn tin tự động cho CTV khi nạp tiền hoặc nâng cấp Gold.
+                </p>
+                <button type="submit" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow-md shadow-indigo-500/20 transition-all cursor-pointer">
+                  💾 Lưu Telegram Bot Token
+                </button>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- ── TAB 6: DEFAULT WHOLESALE PRICES ── -->
+          <div id="tab-wholesale-prices" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-4 border-emerald-500/30">
+              <h3 class="text-base font-black text-white flex items-center gap-2 pb-3 border-b border-white/[0.08]">
+                🏷️ Bảng Giá Sỉ Mặc Định Cho CTV
+              </h3>
+              <form onsubmit="handleSaveDefaultPrices(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Giá Sỉ 1 Năm Mặc Định (VNĐ)</label>
+                    <input type="number" id="cfg-p1y" placeholder="65000" class="w-full px-4 py-3 sb-input text-emerald-400 font-mono text-xs font-bold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Giá Sỉ Vĩnh Viễn Mặc Định (VNĐ)</label>
+                    <input type="number" id="cfg-plt" placeholder="350000" class="w-full px-4 py-3 sb-input text-amber-400 font-mono text-xs font-bold" />
+                  </div>
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md shadow-emerald-500/20 transition-all cursor-pointer">
+                  💾 Lưu Bảng Giá Sỉ Mặc Định
+                </button>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- ── TAB 7: RETAIL CUSTOMER PACKAGES ── -->
+          <div id="tab-retail-packages" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-6 border-amber-500/40">
+              <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/[0.08]">
+                <div>
+                  <h3 class="text-base font-black text-white flex items-center gap-2">
+                    📦 Cấu Hình Bảng Giá & Nội Dung Gói Gold (Trang Chủ Khách Hàng)
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Tùy chỉnh tên gói, giá bán khách lẻ, mô tả và danh sách tính năng hiển thị trên trang chính</p>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-400 border border-amber-500/30">👑 Bán Lẻ Khách Hàng</span>
+              </div>
+
+              <form onsubmit="handleSaveCustomerPackages(event)" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Gói 1 Năm Card -->
+                  <div class="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3.5">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                      <span class="font-black text-xs text-amber-400 uppercase tracking-wide">⭐ Gói 1 Năm (365 Ngày)</span>
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-300 mb-1">Tên Tiêu Đề Gói</label>
+                      <input type="text" id="cfg-pkg-1y-name" placeholder="VD: Gói 1 Năm (365 Ngày)" required class="w-full px-3.5 py-2.5 sb-input text-xs font-bold text-white" />
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-300 mb-1">Giá Bán Khách Lẻ (VNĐ) *</label>
+                      <input type="number" id="cfg-pkg-1y-price" placeholder="79000" required class="w-full px-3.5 py-2.5 sb-input text-xs font-mono font-black text-amber-400" />
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-300 mb-1">Mô Tả Phụ (Subtitle)</label>
+                      <input type="text" id="cfg-pkg-1y-sub" placeholder="VD: Tiết kiệm 80%..." class="w-full px-3.5 py-2.5 sb-input text-xs text-slate-300" />
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-300 mb-1">Danh Sách Tính Năng (Mỗi dòng 1 tính năng)</label>
+                      <textarea id="cfg-pkg-1y-features" rows="4" placeholder="Huy hiệu vương miện Gold 👑&#10;Đăng video dài HD..." class="w-full px-3.5 py-2.5 sb-input text-xs leading-relaxed font-medium text-slate-200"></textarea>
+                    </div>
+                  </div>
+
+                  <!-- Gói Vĩnh Viễn Card -->
+                  <div class="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3.5">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                      <span class="font-black text-xs text-amber-400 uppercase tracking-wide">👑 Gói Vĩnh Viễn (Lifetime)</span>
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-300 mb-1">Tên Tiêu Đề Gói</label>
+                      <input type="text" id="cfg-pkg-lt-name" placeholder="VD: Gói Vĩnh Viễn (Trọn Đời)" required class="w-full px-3.5 py-2.5 sb-input text-xs font-bold text-white" />
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-300 mb-1">Giá Bán Khách Lẻ (VNĐ) *</label>
+                      <input type="number" id="cfg-pkg-lt-price" placeholder="399000" required class="w-full px-3.5 py-2.5 sb-input text-xs font-mono font-black text-amber-400" />
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-[11px] font-bold text-slate-300 mb-1">Mô Tả Phụ (Subtitle)</label>
+                        <input type="text" id="cfg-pkg-lt-sub" placeholder="VD: Dùng mãi mãi..." class="w-full px-3.5 py-2.5 sb-input text-xs text-slate-300" />
+                      </div>
+                      <div>
+                        <label class="block text-[11px] font-bold text-slate-300 mb-1">Huy Hiệu (Badge)</label>
+                        <input type="text" id="cfg-pkg-lt-badge" placeholder="VD: TIẾT KIỆM NHẤT" class="w-full px-3.5 py-2.5 sb-input text-xs font-bold text-amber-400" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-300 mb-1">Danh Sách Tính Năng (Mỗi dòng 1 tính năng)</label>
+                      <textarea id="cfg-pkg-lt-features" rows="4" placeholder="Trọn đời tất cả tính năng Gold..." class="w-full px-3.5 py-2.5 sb-input text-xs leading-relaxed font-medium text-slate-200"></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:opacity-95 text-amber-950 font-black text-xs shadow-lg shadow-amber-500/25 transition-all cursor-pointer">
+                  💾 Lưu Bảng Giá & Nội Dung Gói Locket Gold (Trang Chủ)
+                </button>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- ── TAB 8: BRAND & LOGO CONFIG ── -->
+          <div id="tab-brand" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-4 border-indigo-500/30">
+              <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/[0.08]">
+                <div>
+                  <h3 class="text-base font-black text-white flex items-center gap-2">
+                    🎨 Cấu Hình Thương Hiệu (Logo, Tên Trang Web & Title App)
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Tùy chỉnh Logo hình ảnh, Tên thương hiệu, Thẻ nhãn và Tiêu đề tab trình duyệt cho Trang Chủ</p>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">✨ Brand Identity</span>
+              </div>
+
+              <form onsubmit="handleSaveBrandConfig(event)" class="space-y-4">
+                <div class="space-y-3">
+                  <label class="block text-xs font-bold text-slate-300">Logo Thương Hiệu (Upload từ máy tính hoặc nhập Link)</label>
+                  
+                  <div class="flex items-center gap-3 flex-wrap">
+                    <!-- Preview Box -->
+                    <div id="cfg-brand-logo-preview-box" class="hidden relative w-12 h-12 rounded-2xl border-2 border-amber-500/40 bg-black/50 p-1 flex items-center justify-center shadow-md">
+                      <img id="cfg-brand-logo-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E" alt="Logo Preview" class="w-full h-full object-contain rounded-xl" />
+                      <button type="button" onclick="clearBrandLogo()" class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center shadow-md" title="Xóa logo này">✕</button>
+                    </div>
+
+                    <!-- Hidden File Input -->
+                    <input type="file" id="cfg-brand-logo-file" accept="image/*" onchange="handleLogoFileUpload(event)" class="hidden" />
+                    
+                    <button type="button" onclick="document.getElementById('cfg-brand-logo-file').click()" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer flex items-center gap-1.5">
+                      📁 Chọn Ảnh Logo Từ Máy Tính...
+                    </button>
+                    <span class="text-[11px] text-slate-400 font-medium">Hỗ trợ PNG, JPG, SVG, WebP</span>
+                  </div>
+
+                  <input type="text" id="cfg-brand-logo-url" oninput="updateLogoPreviewFromInput()" placeholder="Hoặc dán Link ảnh URL / Base64 ở đây..." class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-mono font-bold" />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Tên Thương Hiệu (Brand Name) *</label>
+                    <input type="text" id="cfg-brand-name" placeholder="VD: Locket Gold" required class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-bold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Thẻ Nhãn Thương Hiệu (Badge Tag)</label>
+                    <input type="text" id="cfg-brand-tag" placeholder="VD: PREMIUM hoặc OFFICIAL" class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-bold" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Mô Tả Phụ Header (Header Subtitle)</label>
+                    <input type="text" id="cfg-brand-subtitle" placeholder="VD: Kích hoạt tự động 24/7" class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-bold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Tiêu Đề Trang Chủ (Hero H1 Title)</label>
+                    <input type="text" id="cfg-brand-hero-title" placeholder="VD: Nâng cấp Locket Gold tự động 24/7" class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-bold" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1.5">Mô Tả Trang Chủ (Hero Subtitle)</label>
+                  <input type="text" id="cfg-brand-hero-subtitle" placeholder="VD: Kích hoạt siêu tốc trong 0.5 giây..." class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-bold" />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1.5">Tiêu Đề Trang Web trên Tab Trình Duyệt (Tab Title / SEO Title)</label>
+                  <input type="text" id="cfg-brand-site-title" placeholder="VD: Locket Gold | Nâng Cấp Locket Gold Premium Tự Động Uy Tín Số 1" class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-bold" />
+                </div>
+
+                <!-- 🎨 CẤU HÌNH MÀU CHỮ & MÀU ĐIỂM NHẤN -->
+                <div class="pt-2 border-t border-white/10 space-y-3">
+                  <h4 class="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🎨 Cấu Hình Màu Chữ & Màu Điểm Nhấn Trang Chủ</span>
+                  </h4>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="p-3 rounded-xl bg-black/30 border border-white/10 space-y-1.5">
+                      <label class="block text-[11px] font-bold text-slate-300">Màu Tên Thương Hiệu</label>
+                      <div class="flex items-center gap-2">
+                        <input type="color" id="cfg-brand-name-color-picker" onchange="document.getElementById('cfg-brand-name-color').value = this.value" class="w-8 h-8 rounded-lg cursor-pointer border-0 bg-transparent" value="#FFFFFF" />
+                        <input type="text" id="cfg-brand-name-color" oninput="document.getElementById('cfg-brand-name-color-picker').value = this.value" placeholder="#FFFFFF" class="w-full px-2.5 py-1.5 sb-input text-white text-xs font-mono font-bold" />
+                      </div>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-black/30 border border-white/10 space-y-1.5">
+                      <label class="block text-[11px] font-bold text-slate-300">Màu Tiêu Đề H1</label>
+                      <div class="flex items-center gap-2">
+                        <input type="color" id="cfg-brand-hero-title-color-picker" onchange="document.getElementById('cfg-brand-hero-title-color').value = this.value" class="w-8 h-8 rounded-lg cursor-pointer border-0 bg-transparent" value="#FFFFFF" />
+                        <input type="text" id="cfg-brand-hero-title-color" oninput="document.getElementById('cfg-brand-hero-title-color-picker').value = this.value" placeholder="#FFFFFF" class="w-full px-2.5 py-1.5 sb-input text-white text-xs font-mono font-bold" />
+                      </div>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-black/30 border border-white/10 space-y-1.5">
+                      <label class="block text-[11px] font-bold text-slate-300">Màu Mô Tả Phụ</label>
+                      <div class="flex items-center gap-2">
+                        <input type="color" id="cfg-brand-hero-sub-color-picker" onchange="document.getElementById('cfg-brand-hero-sub-color').value = this.value" class="w-8 h-8 rounded-lg cursor-pointer border-0 bg-transparent" value="#9CA3AF" />
+                        <input type="text" id="cfg-brand-hero-sub-color" oninput="document.getElementById('cfg-brand-hero-sub-color-picker').value = this.value" placeholder="#9CA3AF" class="w-full px-2.5 py-1.5 sb-input text-white text-xs font-mono font-bold" />
+                      </div>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-black/30 border border-white/10 space-y-1.5">
+                      <label class="block text-[11px] font-bold text-slate-300">Màu Điểm Nhấn Gold</label>
+                      <div class="flex items-center gap-2">
+                        <input type="color" id="cfg-brand-accent-color-picker" onchange="document.getElementById('cfg-brand-accent-color').value = this.value" class="w-8 h-8 rounded-lg cursor-pointer border-0 bg-transparent" value="#F59E0B" />
+                        <input type="text" id="cfg-brand-accent-color" oninput="document.getElementById('cfg-brand-accent-color-picker').value = this.value" placeholder="#F59E0B" class="w-full px-2.5 py-1.5 sb-input text-white text-xs font-mono font-bold" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:opacity-95 text-amber-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer">
+                  💾 Lưu Cấu Hình Thương Hiệu & Logo Trang Chủ
+                </button>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- ── TAB 9: NOTICE POPUP CONFIG ── -->
+          <div id="tab-notice" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-4 border-amber-500/30">
+              <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/[0.08]">
+                <div>
+                  <h3 class="text-base font-black text-white flex items-center gap-2">
+                    📢 Cấu Hình Bảng Thông Báo Popup (Announcement Modal)
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Bật/Tắt và chỉnh sửa bảng thông báo tự động bật lên khi người dùng truy cập trang chủ.</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="cfg-notice-enabled" class="sr-only peer" onchange="toggleNoticeFields(this.checked)">
+                  <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                  <span class="ml-2 text-xs font-bold text-slate-300" id="cfg-notice-enabled-text">Đang Bật</span>
+                </label>
+              </div>
+
+              <form onsubmit="handleSaveNoticeConfig(event)" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1.5">Tiêu Đề Bảng Thông Báo *</label>
+                  <input type="text" id="cfg-notice-title" placeholder="VD: 📢 Thông Báo Hệ Thống" required class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-bold" />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-300 mb-1.5">Nội Dung Thông Báo (Hỗ trợ HTML, CSS, xuống dòng & dấu gạch đầu dòng •)</label>
+                  <textarea id="cfg-notice-content" rows="6" oninput="updateNoticePreview()" placeholder="Nhập nội dung thông báo cho khách hàng tại đây (hỗ trợ cả văn bản thường lẫn HTML/CSS)..." class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-mono leading-relaxed"></textarea>
+                  <p class="text-[11px] text-slate-400 mt-1">💡 <b>Gợi ý HTML & CSS:</b> Sử dụng <code>&lt;b&gt;In đậm&lt;/b&gt;</code>, <code>&lt;span class=&quot;text-amber-400 font-bold&quot;&gt;Chữ màu vàng&lt;/span&gt;</code>, <code>&lt;a href=&quot;...&quot;&gt;Chèn link&lt;/a&gt;</code>, <code>&lt;div style=&quot;color: #10B981;&quot;&gt;CSS inline&lt;/div&gt;</code> hoặc xuống dòng trực tiếp.</p>
+                </div>
+
+                <!-- Live Notice Preview Box -->
+                <div class="p-3.5 rounded-2xl bg-black/40 border border-amber-500/20 space-y-2">
+                  <div class="text-[11px] font-bold text-amber-400 flex items-center gap-1.5">
+                    <span>👁️ Xem Trước Trực Tiếp (Live Preview HTML & CSS):</span>
+                  </div>
+                  <div id="cfg-notice-preview" class="p-4 rounded-xl bg-[#161B28] border border-white/10 text-xs text-slate-200 leading-relaxed font-sans min-h-[60px] break-words"></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label class="block text-xs font-bold text-amber-400">Nút Nổi Bật 1 (Nút Đỏ/Vàng)</label>
+                    <input type="text" id="cfg-notice-btn1-text" placeholder="VD: Nhóm Thông Báo & Hỗ Trợ Zalo" class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-bold" />
+                    <input type="url" id="cfg-notice-btn1-url" placeholder="Link URL: https://zalo.me/g/..." class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-mono font-bold" />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-400">Nút Phụ 2 (Tùy chọn)</label>
+                    <input type="text" id="cfg-notice-btn2-text" placeholder="VD: Kênh Telegram Dự Phòng" class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-bold" />
+                    <input type="url" id="cfg-notice-btn2-url" placeholder="Link URL: https://t.me/..." class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-mono font-bold" />
+                  </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:opacity-95 text-amber-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer">
+                  💾 Lưu Cấu Hình Bảng Thông Báo Popup
+                </button>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- ── TAB 10: FAQ CONFIG ── -->
+          <div id="tab-faqs" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-4 border-amber-500/30">
+              <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/[0.08]">
+                <div>
+                  <h3 class="text-base font-black text-white flex items-center gap-2">
+                    ❓ Cấu Hình Câu Hỏi Thường Gặp (FAQ / Q&A Trang Chủ)
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Nhập các ô Câu Hỏi và Câu Trả Lời trực quan. Dễ dàng thêm, sửa hoặc xóa từng câu.</p>
+                </div>
+                <button type="button" onclick="addFaqItem()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer flex items-center gap-1">
+                  ➕ Thêm Câu Hỏi Mới
+                </button>
+              </div>
+
+              <form onsubmit="handleSaveFaqsConfig(event)" class="space-y-4">
+                <!-- FAQ Dynamic Cards Container -->
+                <div id="cfg-faqs-container" class="space-y-3.5">
+                  <!-- Rendered dynamically by JavaScript -->
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                  <button type="button" onclick="addFaqItem()" class="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-xs transition-all cursor-pointer">
+                    ➕ Thêm Câu Hỏi
+                  </button>
+                  <button type="submit" class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-95 text-amber-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer">
+                    💾 Lưu Danh Sách Câu Hỏi FAQ (Trang Chủ)
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- ── TAB 11: CONTACT SUPPORT CONFIG ── -->
+          <div id="tab-contact" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-4 border-indigo-500/30">
+              <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/[0.08]">
+                <div>
+                  <h3 class="text-base font-black text-white flex items-center gap-2">
+                    📞 Cài Đặt Thông Tin Liên Hệ Admin & Hỗ Trợ 24/7
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Hiển thị các kênh liên hệ trực tiếp cho khách hàng và CTV trên toàn hệ thống</p>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">💬 Hỗ Trợ Khách Hàng</span>
+              </div>
+
+              <form onsubmit="handleSaveContactConfig(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Link Facebook Admin / Fanpage</label>
+                    <input type="text" id="cfg-contact-fb" placeholder="https://www.facebook.com/vnkin.06" class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Link Telegram Admin / Kênh Hỗ Trợ</label>
+                    <input type="text" id="cfg-contact-tele" placeholder="https://t.me/vnkien26" class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-mono" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Số Zalo / Hotline Hỗ Trợ</label>
+                    <input type="text" id="cfg-contact-zalo" placeholder="VD: 0987654321" class="w-full px-3.5 py-2.5 sb-input text-white text-xs font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Lời Nhắc Khách Hàng (Support Text)</label>
+                    <input type="text" id="cfg-contact-text" placeholder="VD: Cần hỗ trợ thanh toán hoặc thắc mắc?..." class="w-full px-3.5 py-2.5 sb-input text-white text-xs" />
+                  </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow-md shadow-indigo-500/20 transition-all cursor-pointer">
+                  💾 Lưu Thông Tin Liên Hệ Admin 24/7
+                </button>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- ── TAB 12: ADMIN CREDENTIALS ── -->
+          <div id="tab-admin-creds" class="tab-content hidden space-y-6 animate-fade-in">
+            <div class="sb-card p-5 sm:p-6 space-y-4 border-amber-500/30">
+              <h3 class="text-base font-black text-white flex items-center gap-2 pb-3 border-b border-white/[0.08]">
+                🔐 Đổi Tên Đăng Nhập & Mật Khẩu Admin
+              </h3>
+              <form onsubmit="handleChangeAdminCredentials(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Username Admin Mới *</label>
+                    <input type="text" id="cfg-admin-user" placeholder="VD: admin" required class="w-full px-4 py-3 sb-input text-white text-xs font-bold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Mật Khẩu Admin Mới *</label>
+                    <input type="password" id="cfg-admin-pass" placeholder="Nhập mật khẩu mới..." required class="w-full px-4 py-3 sb-input text-white text-xs font-bold" />
+                  </div>
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-amber-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer">
+                  🔑 Cập Nhật Tài Khoản Admin
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-auto py-4 px-6 border-t border-white/[0.08] text-center text-xs text-slate-500 font-semibold">
+          SB Admin Pro &copy; 2026 Locket Gold System. All rights reserved.
+        </footer>
+
+      </div>
+
+    </div>
+
+    <!-- ── MOBILE BOTTOM NAVIGATION BAR (<768px) ── -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0B0F19]/90 backdrop-blur-xl border-t border-white/10 px-2 py-1.5">
+      <div class="grid grid-cols-4 gap-1 max-w-md mx-auto">
+        
+        <button type="button" id="mob-btn-tab-dashboard" onclick="switchTab('tab-dashboard')" class="mob-tab-btn py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 transition-all cursor-pointer">
+          <span class="text-base">📊</span>
+          <span>Tổng Quan</span>
+        </button>
+
+        <button type="button" id="mob-btn-tab-public-orders" onclick="switchTab('tab-public-orders')" class="mob-tab-btn py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-bold text-slate-400 hover:text-white transition-all cursor-pointer">
+          <span class="text-base">🛒</span>
+          <span>Web Chính</span>
+        </button>
+
+        <button type="button" id="mob-btn-tab-ctv" onclick="switchTab('tab-ctv')" class="mob-tab-btn py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-bold text-slate-400 hover:text-white transition-all cursor-pointer">
+          <span class="text-base">👥</span>
+          <span>CTV</span>
+        </button>
+
+        <button type="button" id="mob-btn-tab-ctv-orders" onclick="switchTab('tab-ctv-orders')" class="mob-tab-btn py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-bold text-slate-400 hover:text-white transition-all cursor-pointer">
+          <span class="text-base">📦</span>
+          <span>Đơn CTV</span>
+        </button>
+
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- ── 3. JAVASCRIPT LOGIC ── -->
+  <script>
+    let adminToken = localStorage.getItem('adminToken') || null;
+    let globalData = {};
+    let ctvData = { ctvAccounts: [], ctvOrders: [] };
+    let showPassState = {};
+    let currentCtvViewMode = 'cards';
+    let currentPublicOrderFilter = 'ALL';
+    let isSidebarOpen = true;
+
+    // Enforce dark mode
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('adminTheme', 'dark');
+
+    function toggleSidebar(forceState) {
+      const body = document.body;
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      
+      if (window.innerWidth < 1024) {
+        if (typeof forceState === 'boolean') {
+          if (forceState) {
+            sidebar?.classList.remove('sb-sidebar-hidden');
+            backdrop?.classList.remove('hidden');
+          } else {
+            sidebar?.classList.add('sb-sidebar-hidden');
+            backdrop?.classList.add('hidden');
+          }
+        } else {
+          sidebar?.classList.toggle('sb-sidebar-hidden');
+          backdrop?.classList.toggle('hidden');
+        }
+      } else {
+        if (typeof forceState === 'boolean') {
+          if (forceState) {
+            body.classList.remove('sb-collapsed');
+          } else {
+            body.classList.add('sb-collapsed');
+          }
+        } else {
+          body.classList.toggle('sb-collapsed');
+        }
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toast-text');
+      if (toastText) toastText.textContent = msg;
+      if (toast) {
+        toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+        }, 3000);
+      }
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-user').value.trim();
+      const password = document.getElementById('login-pass').value.trim();
+      const btn = document.getElementById('login-btn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>Đang xác thực...</span>';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.token) {
+          adminToken = data.token;
+          localStorage.setItem('adminToken', adminToken);
+          showToast('🔑 Đăng nhập Admin thành công!');
+          initApp();
+        } else {
+          showToast('❌ ' + (data.error || 'Sai tên đăng nhập hoặc mật khẩu!'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối tới máy chủ!');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Đăng Nhập Quản Trị</span>';
+      }
+    }
+
+    function handleLogout() {
+      adminToken = null;
+      localStorage.removeItem('adminToken');
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      showToast('Đã đăng xuất Admin');
+    }
+
+    async function initApp() {
+      if (!adminToken) {
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('dashboard').classList.add('hidden');
+        return;
+      }
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      await loadAdminData();
+    }
+
+    async function fetchAdminApi(urlPath, options = {}) {
+      options.cache = 'no-store';
+      options.headers = {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        Authorization: `Bearer ${adminToken}`,
+        ...(options.headers || {})
+      };
+      const sep = urlPath.includes('?') ? '&' : '?';
+      const fullUrl = urlPath.startsWith('http') ? urlPath : `${urlPath}${sep}_t=${Date.now()}`;
+      let res = await fetch(fullUrl, options);
+      if (res.status === 404 && urlPath.startsWith('/api/') && !urlPath.startsWith('/api/v1/')) {
+        const v1Path = urlPath.replace('/api/', '/api/v1/');
+        const sepV1 = v1Path.includes('?') ? '&' : '?';
+        res = await fetch(`${v1Path}${sepV1}_t=${Date.now()}`, options);
+      }
+      return res;
+    }
+
+    async function loadAdminData(isManual = false) {
+      if (!adminToken) return;
+      const refreshIcon = document.getElementById('icon-refresh-admin');
+      if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+      try {
+        const res = await fetchAdminApi('/api/admin/data');
+        if (res.status === 401) {
+          handleLogout();
+          return;
+        }
+        if (res.ok) {
+          globalData = await res.json();
+          ctvData = {
+            ctvAccounts: globalData.ctvAccounts || [],
+            ctvOrders: globalData.ctvOrders || []
+          };
+          if (globalData.adminUser) {
+            const el = document.getElementById('cfg-admin-user');
+            const elSidebarUser = document.getElementById('sidebar-admin-user');
+            if (el) el.value = globalData.adminUser;
+            if (elSidebarUser) elSidebarUser.textContent = globalData.adminUser;
+          }
+          if (globalData.prices) {
+            const p1yInp = document.getElementById('cfg-p1y');
+            const pltInp = document.getElementById('cfg-plt');
+            if (p1yInp) p1yInp.value = globalData.prices['1year'] || 65000;
+            if (pltInp) pltInp.value = globalData.prices['lifetime'] || 350000;
+          }
+          renderAll();
+          await Promise.allSettled([
+            loadTelegramToken(),
+            loadUpstreamInfo(),
+            loadSepayConfig(),
+            loadSepayLogs(),
+            loadCustomerPackagesConfig(),
+            loadContactConfig(),
+            loadBrandConfig(),
+            loadNoticeConfig(),
+            loadFaqsConfig(),
+            loadPublicOrders()
+          ]);
+
+          if (isManual) {
+            showToast('🔄 Đã làm mới toàn bộ dữ liệu hệ thống thành công!');
+          }
+        } else {
+          if (isManual) showToast('❌ Không thể tải dữ liệu từ máy chủ');
+        }
+      } catch(e) {
+        console.error(e);
+        if (isManual) showToast('❌ Lỗi kết nối khi làm mới dữ liệu');
+      } finally {
+        if (refreshIcon) {
+          setTimeout(() => refreshIcon.classList.remove('animate-spin'), 500);
+        }
+      }
+    }
+
+    function updateLogoPreviewFromInput() {
+      const url = (document.getElementById('cfg-brand-logo-url')?.value || '').trim();
+      const box = document.getElementById('cfg-brand-logo-preview-box');
+      const img = document.getElementById('cfg-brand-logo-preview');
+      if (url && box && img) {
+        img.src = url;
+        box.classList.remove('hidden');
+      } else if (box) {
+        box.classList.add('hidden');
+      }
+    }
+
+    function clearBrandLogo() {
+      const inp = document.getElementById('cfg-brand-logo-url');
+      if (inp) inp.value = '';
+      updateLogoPreviewFromInput();
+    }
+
+    function handleLogoFileUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast('⚠️ Vui lòng chọn tệp hình ảnh hợp lệ (PNG, JPG, SVG, WebP)');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const base64Data = evt.target.result;
+        const inp = document.getElementById('cfg-brand-logo-url');
+        if (inp) inp.value = base64Data;
+        updateLogoPreviewFromInput();
+        showToast('📁 Đã tải ảnh Logo từ máy tính lên! Bấm "Lưu Cấu Hình" để cập nhật.');
+      };
+      reader.onerror = function() {
+        showToast('❌ Lỗi đọc tệp ảnh từ máy');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function loadBrandConfig() {
+      let b = globalData.brand;
+      if (!b) {
+        try {
+          const res = await fetchAdminApi('/api/admin/brand-config');
+          if (res.ok) {
+            const d = await res.json();
+            if (d.brand) {
+              b = d.brand;
+              globalData.brand = b;
+            }
+          }
+        } catch (_) {}
+      }
+      if (!b) b = {};
+
+      const elLogo = document.getElementById('cfg-brand-logo-url');
+      const elName = document.getElementById('cfg-brand-name');
+      const elTag = document.getElementById('cfg-brand-tag');
+      const elTitle = document.getElementById('cfg-brand-site-title');
+      const elSub = document.getElementById('cfg-brand-subtitle');
+      const elHeroTitle = document.getElementById('cfg-brand-hero-title');
+      const elHeroSub = document.getElementById('cfg-brand-hero-subtitle');
+
+      if (elLogo) elLogo.value = b.logoUrl || '';
+      if (elName) elName.value = b.brandName !== undefined ? b.brandName : 'Locket Gold';
+      if (elTag) elTag.value = b.brandTag !== undefined ? b.brandTag : 'PREMIUM';
+      if (elTitle) elTitle.value = b.siteTitle || '';
+      if (elSub) elSub.value = b.subtitle !== undefined ? b.subtitle : 'Kích hoạt tự động 24/7';
+      if (elHeroTitle) elHeroTitle.value = b.heroTitle !== undefined ? b.heroTitle : 'Nâng cấp Locket Gold tự động 24/7';
+      if (elHeroSub) elHeroSub.value = b.heroSubtitle !== undefined ? b.heroSubtitle : 'Kích hoạt siêu tốc trong 0.5 giây chỉ bằng Username, bảo hành 1 đổi 1 suốt thời gian sử dụng.';
+      
+      // Load text colors
+      const nameColor = b.brandNameColor || '#FFFFFF';
+      const titleColor = b.heroTitleColor || '#FFFFFF';
+      const subColor = b.heroSubtitleColor || '#9CA3AF';
+      const accentColor = b.accentColor || '#F59E0B';
+
+      if (document.getElementById('cfg-brand-name-color')) document.getElementById('cfg-brand-name-color').value = nameColor;
+      if (document.getElementById('cfg-brand-name-color-picker')) document.getElementById('cfg-brand-name-color-picker').value = nameColor;
+      if (document.getElementById('cfg-brand-hero-title-color')) document.getElementById('cfg-brand-hero-title-color').value = titleColor;
+      if (document.getElementById('cfg-brand-hero-title-color-picker')) document.getElementById('cfg-brand-hero-title-color-picker').value = titleColor;
+      if (document.getElementById('cfg-brand-hero-sub-color')) document.getElementById('cfg-brand-hero-sub-color').value = subColor;
+      if (document.getElementById('cfg-brand-hero-sub-color-picker')) document.getElementById('cfg-brand-hero-sub-color-picker').value = subColor;
+      if (document.getElementById('cfg-brand-accent-color')) document.getElementById('cfg-brand-accent-color').value = accentColor;
+      if (document.getElementById('cfg-brand-accent-color-picker')) document.getElementById('cfg-brand-accent-color-picker').value = accentColor;
+
+      updateLogoPreviewFromInput();
+
+      // Update favicon dynamically
+      const targetFavicon = b.logoUrl && b.logoUrl.trim() ? b.logoUrl.trim() : '/favicon.svg';
+      const favLinks = document.querySelectorAll("link[rel*='icon']");
+      if (favLinks.length > 0) {
+        const first = favLinks[0];
+        first.removeAttribute('type');
+        first.rel = 'icon';
+        first.href = targetFavicon;
+        for (let i = 1; i < favLinks.length; i++) {
+          favLinks[i].remove();
+        }
+      }
+    }
+
+    async function handleSaveBrandConfig(e) {
+      e.preventDefault();
+      const logoUrl = document.getElementById('cfg-brand-logo-url').value.trim();
+      const brandName = document.getElementById('cfg-brand-name').value.trim();
+      const brandTag = document.getElementById('cfg-brand-tag').value.trim();
+      const siteTitle = document.getElementById('cfg-brand-site-title').value.trim();
+      const subtitle = document.getElementById('cfg-brand-subtitle').value.trim();
+      const heroTitle = document.getElementById('cfg-brand-hero-title') ? document.getElementById('cfg-brand-hero-title').value.trim() : '';
+      const heroSubtitle = document.getElementById('cfg-brand-hero-subtitle') ? document.getElementById('cfg-brand-hero-subtitle').value.trim() : '';
+      const brandNameColor = document.getElementById('cfg-brand-name-color') ? document.getElementById('cfg-brand-name-color').value.trim() : '#FFFFFF';
+      const heroTitleColor = document.getElementById('cfg-brand-hero-title-color') ? document.getElementById('cfg-brand-hero-title-color').value.trim() : '#FFFFFF';
+      const heroSubtitleColor = document.getElementById('cfg-brand-hero-sub-color') ? document.getElementById('cfg-brand-hero-sub-color').value.trim() : '#9CA3AF';
+      const accentColor = document.getElementById('cfg-brand-accent-color') ? document.getElementById('cfg-brand-accent-color').value.trim() : '#F59E0B';
+
+      try {
+        const res = await fetchAdminApi('/api/admin/brand-config', {
+          method: 'POST',
+          body: JSON.stringify({ logoUrl, brandName, brandTag, siteTitle, subtitle, heroTitle, heroSubtitle, brandNameColor, heroTitleColor, heroSubtitleColor, accentColor })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          globalData.brand = data.brand;
+          showToast('🎨 Đã lưu cấu hình thương hiệu & tiêu đề trang chủ!');
+
+          // Update favicon dynamically
+          const targetFavicon = data.brand?.logoUrl && data.brand.logoUrl.trim() ? data.brand.logoUrl.trim() : '/favicon.svg';
+          const favLinks = document.querySelectorAll("link[rel*='icon']");
+          if (favLinks.length > 0) {
+            const first = favLinks[0];
+            first.removeAttribute('type');
+            first.rel = 'icon';
+            first.href = targetFavicon;
+            for (let i = 1; i < favLinks.length; i++) {
+              favLinks[i].remove();
+            }
+          }
+        } else {
+          showToast('❌ ' + (data.error || 'Lỗi khi lưu cấu hình thương hiệu'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối máy chủ!');
+      }
+    }
+
+    function updateNoticePreview() {
+      const content = document.getElementById('cfg-notice-content')?.value || '';
+      const previewBox = document.getElementById('cfg-notice-preview');
+      if (previewBox) {
+        if (!content.trim()) {
+          previewBox.innerHTML = '<span class="text-slate-500 italic">Chưa có nội dung thông báo...</span>';
+        } else {
+          const hasHtml = /<[a-z][\s\S]*>/i.test(content);
+          previewBox.innerHTML = hasHtml ? content : content.replace(/\n/g, '<br/>');
+        }
+      }
+    }
+
+    async function loadNoticeConfig() {
+      let n = globalData.notice;
+      if (!n) {
+        try {
+          const res = await fetchAdminApi('/api/admin/notice-config');
+          if (res.ok) {
+            const d = await res.json();
+            if (d.notice) {
+              n = d.notice;
+              globalData.notice = n;
+            }
+          }
+        } catch (_) {}
+      }
+      if (!n) {
+        n = {
+          enabled: true,
+          title: '📢 Thông Báo Hệ Thống',
+          content: 'Chào mừng bạn đến với hệ thống Nâng Cấp Locket Gold Tự Động 24/7!\n\n• Kích hoạt siêu tốc trong 0.5s chỉ bằng Username.\n• Bảo hành 1 đổi 1 suốt thời gian sử dụng.\n• Không cần tài khoản iCloud hay mật khẩu.',
+          button1Text: 'Nhóm Thông Báo & Hỗ Trợ',
+          button1Url: ''
+        };
+      }
+
+      const elEnable = document.getElementById('cfg-notice-enabled');
+      const elTitle = document.getElementById('cfg-notice-title');
+      const elContent = document.getElementById('cfg-notice-content');
+      const elBtn1Text = document.getElementById('cfg-notice-btn1-text');
+      const elBtn1Url = document.getElementById('cfg-notice-btn1-url');
+      const elBtn2Text = document.getElementById('cfg-notice-btn2-text');
+      const elBtn2Url = document.getElementById('cfg-notice-btn2-url');
+
+      if (elEnable) {
+        elEnable.checked = n.enabled !== false;
+        toggleNoticeFields(n.enabled !== false);
+      }
+      if (elTitle) elTitle.value = n.title !== undefined ? n.title : '📢 Thông Báo Hệ Thống';
+      if (elContent) elContent.value = n.content !== undefined ? n.content : '';
+      if (elBtn1Text) elBtn1Text.value = n.button1Text || '';
+      if (elBtn1Url) elBtn1Url.value = n.button1Url || '';
+      if (elBtn2Text) elBtn2Text.value = n.button2Text || '';
+      if (elBtn2Url) elBtn2Url.value = n.button2Url || '';
+
+      updateNoticePreview();
+    }
+
+    async function handleSaveNoticeConfig(e) {
+      e.preventDefault();
+      const enabled = document.getElementById('cfg-notice-enabled').checked;
+      const title = document.getElementById('cfg-notice-title').value.trim();
+      const content = document.getElementById('cfg-notice-content').value.trim();
+      const button1Text = document.getElementById('cfg-notice-btn1-text').value.trim();
+      const button1Url = document.getElementById('cfg-notice-btn1-url').value.trim();
+      const button2Text = document.getElementById('cfg-notice-btn2-text').value.trim();
+      const button2Url = document.getElementById('cfg-notice-btn2-url').value.trim();
+
+      try {
+        const res = await fetchAdminApi('/api/admin/notice-config', {
+          method: 'POST',
+          body: JSON.stringify({ enabled, title, content, button1Text, button1Url, button2Text, button2Url })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          globalData.notice = data.notice;
+          showToast('📢 Đã lưu cấu hình bảng thông báo Popup!');
+        } else {
+          showToast('❌ ' + (data.error || 'Lỗi khi lưu cấu hình thông báo'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối máy chủ');
+      }
+    }
+
+    let faqsListState = [];
+
+    function renderFaqsEditor() {
+      const container = document.getElementById('cfg-faqs-container');
+      if (!container) return;
+
+      if (!faqsListState || faqsListState.length === 0) {
+        container.innerHTML = '<div class="p-6 text-center text-slate-500 text-xs bg-black/30 rounded-2xl border border-dashed border-white/10">Chưa có câu hỏi FAQ nào. Bấm "Thêm Câu Hỏi Mới" ở trên để tạo.</div>';
+        return;
+      }
+
+      container.innerHTML = faqsListState.map((f, idx) => `
+        <div class="faq-editor-card p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3 relative">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-black text-amber-400">❓ Câu Hỏi #${idx + 1}</span>
+            <button type="button" onclick="removeFaqItem(${idx})" class="p-1 px-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold text-xs transition-all cursor-pointer" title="Xóa câu hỏi này">
+              🗑️ Xóa
+            </button>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 mb-1">Câu Hỏi (Title):</label>
+            <input type="text" value="${(f.q || '').replace(/"/g, '&quot;')}" onchange="updateFaqItemField(${idx}, 'q', this.value)" placeholder="VD: Tôi có cần cung cấp mật khẩu không?" class="faq-q-input w-full px-3.5 py-2.5 sb-input text-xs font-bold text-white" />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 mb-1">Câu Trả Lời (Content):</label>
+            <textarea rows="2" onchange="updateFaqItemField(${idx}, 'a', this.value)" placeholder="VD: Hoàn toàn KHÔNG! Chỉ cần nhập Username Locket..." class="faq-a-input w-full px-3.5 py-2.5 sb-input text-xs font-medium leading-relaxed text-slate-200">${f.a || ''}</textarea>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addFaqItem() {
+      syncFaqsInputsToState();
+      faqsListState.push({ q: '', a: '' });
+      renderFaqsEditor();
+    }
+
+    function removeFaqItem(idx) {
+      syncFaqsInputsToState();
+      faqsListState.splice(idx, 1);
+      renderFaqsEditor();
+    }
+
+    function updateFaqItemField(idx, field, value) {
+      if (faqsListState[idx]) {
+        faqsListState[idx][field] = value;
+      }
+    }
+
+    function syncFaqsInputsToState() {
+      const qInps = document.querySelectorAll('.faq-q-input');
+      const aInps = document.querySelectorAll('.faq-a-input');
+      qInps.forEach((inp, idx) => {
+        if (faqsListState[idx]) {
+          faqsListState[idx].q = inp.value;
+        }
+      });
+      aInps.forEach((inp, idx) => {
+        if (faqsListState[idx]) {
+          faqsListState[idx].a = inp.value;
+        }
+      });
+    }
+
+    async function loadFaqsConfig() {
+      let faqs = globalData.faqs;
+      if (!faqs || !Array.isArray(faqs) || faqs.length === 0) {
+        try {
+          const res = await fetchAdminApi('/api/admin/faqs-config');
+          if (res.ok) {
+            const d = await res.json();
+            if (d.faqs && Array.isArray(d.faqs)) {
+              faqs = d.faqs;
+              globalData.faqs = faqs;
+            }
+          }
+        } catch (_) {}
+      }
+      if (faqs && Array.isArray(faqs) && faqs.length > 0) {
+        faqsListState = JSON.parse(JSON.stringify(faqs));
+      } else {
+        faqsListState = [
+          { q: "Tôi có cần cung cấp mật khẩu Locket hay iCloud không?", a: "Hoàn toàn KHÔNG! Hệ thống chỉ cần Username Locket để kích hoạt tự động 100% qua API chính chủ, bảo mật tuyệt đối." },
+          { q: "Sau khi chuyển khoản bao lâu thì có Gold?", a: "Ngay sau khi ngân hàng báo giao dịch thành công (thường từ 1-3 giây), hệ thống bot sẽ tự động kích hoạt Gold cho bạn ngay lập tức." },
+          { q: "Có được bảo hành trong suốt thời gian sử dụng không?", a: "Có! Chúng tôi cam kết bảo hành 1 đổi 1 trọn thời gian sử dụng. Nếu gặp sự cố, bạn chỉ cần liên hệ Admin hỗ trợ 24/7." }
+        ];
+        globalData.faqs = faqsListState;
+      }
+      renderFaqsEditor();
+    }
+
+    async function handleSaveFaqsConfig(e) {
+      e.preventDefault();
+      syncFaqsInputsToState();
+
+      const faqs = faqsListState.map(item => ({
+        q: (item.q || '').trim(),
+        a: (item.a || '').trim()
+      })).filter(item => item.q && item.a);
+
+      try {
+        const res = await fetchAdminApi('/api/admin/faqs-config', {
+          method: 'POST',
+          body: JSON.stringify({ faqs })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          globalData.faqs = data.faqs;
+          faqsListState = JSON.parse(JSON.stringify(data.faqs));
+          renderFaqsEditor();
+          showToast('❓ Đã lưu danh sách Câu Hỏi Thường Gặp (FAQ) thành công!');
+        } else {
+          showToast('❌ ' + (data.error || 'Lỗi khi lưu FAQ'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function loadCustomerPackagesConfig() {
+      let pkgs = globalData.packages;
+      if (!pkgs) {
+        try {
+          const res = await fetchAdminApi('/api/admin/packages-config');
+          if (res.ok) {
+            const d = await res.json();
+            if (d.packages) {
+              pkgs = d.packages;
+              globalData.packages = pkgs;
+            }
+          }
+        } catch (_) {}
+      }
+      if (!pkgs) pkgs = {};
+
+      const pkg1y = pkgs['1year'] || {
+        name: 'Locket Gold Pro',
+        price: 79000,
+        subtitle: 'Up Locket Gold bằng Username Locket',
+        features: [
+          'Mở khóa Locket Gold độc quyền 👑',
+          'Không quảng cáo phiền toái',
+          'Upload ảnh không giới hạn từ thư viện',
+          'Quay video Lockets 15s HD 1080p',
+          'Xem ai đã xem Lockets của bạn',
+          'Thay đổi icon Locket độc quyền',
+          'Mở khóa giới hạn số lượng bạn bè',
+          'Kích hoạt tự động ngay sau thanh toán'
+        ]
+      };
+      const pkgLt = pkgs['lifetime'] || {
+        name: 'Locket Gold Premium',
+        price: 399000,
+        subtitle: 'Up Locket Gold bằng Username Locket trọn đời',
+        badge: 'KHUYÊN DÙNG',
+        features: [
+          'Trọn đời tất cả tính năng Locket Gold 👑',
+          'Không quảng cáo phiền toái mãi mãi',
+          'Upload ảnh không giới hạn từ thư viện',
+          'Quay video Lockets 15s HD 1080p',
+          'Xem ai đã xem Lockets của bạn',
+          'Thay đổi icon Locket độc quyền',
+          'Mở khóa không giới hạn bạn bè',
+          'Cập nhật tính năng mới miễn phí trọn đời',
+          'Bảo hành vĩnh viễn 100% (1 đổi 1)'
+        ]
+      };
+
+      const el1yName = document.getElementById('cfg-pkg-1y-name');
+      const el1yPrice = document.getElementById('cfg-pkg-1y-price');
+      const el1ySub = document.getElementById('cfg-pkg-1y-sub');
+      const el1yFeat = document.getElementById('cfg-pkg-1y-features');
+
+      if (el1yName) el1yName.value = pkg1y.name || 'Locket Gold Pro';
+      if (el1yPrice) el1yPrice.value = pkg1y.price || 79000;
+      if (el1ySub) el1ySub.value = pkg1y.subtitle || '';
+      if (el1yFeat) el1yFeat.value = Array.isArray(pkg1y.features) ? pkg1y.features.join('\n') : (typeof pkg1y.features === 'string' ? pkg1y.features : '');
+
+      const elLtName = document.getElementById('cfg-pkg-lt-name');
+      const elLtPrice = document.getElementById('cfg-pkg-lt-price');
+      const elLtSub = document.getElementById('cfg-pkg-lt-sub');
+      const elLtBadge = document.getElementById('cfg-pkg-lt-badge');
+      const elLtFeat = document.getElementById('cfg-pkg-lt-features');
+
+      if (elLtName) elLtName.value = pkgLt.name || 'Locket Gold Premium';
+      if (elLtPrice) elLtPrice.value = pkgLt.price || 399000;
+      if (elLtSub) elLtSub.value = pkgLt.subtitle || '';
+      if (elLtBadge) elLtBadge.value = pkgLt.badge || '';
+      if (elLtFeat) elLtFeat.value = Array.isArray(pkgLt.features) ? pkgLt.features.join('\n') : (typeof pkgLt.features === 'string' ? pkgLt.features : '');
+    }
+
+    async function handleSaveCustomerPackages(e) {
+      e.preventDefault();
+      const pkg1y = {
+        name: document.getElementById('cfg-pkg-1y-name').value.trim(),
+        price: Number(document.getElementById('cfg-pkg-1y-price').value) || 79000,
+        subtitle: document.getElementById('cfg-pkg-1y-sub').value.trim(),
+        features: document.getElementById('cfg-pkg-1y-features').value.split('\n').map(s => s.trim()).filter(Boolean)
+      };
+      const pkgLt = {
+        name: document.getElementById('cfg-pkg-lt-name').value.trim(),
+        price: Number(document.getElementById('cfg-pkg-lt-price').value) || 399000,
+        subtitle: document.getElementById('cfg-pkg-lt-sub').value.trim(),
+        badge: document.getElementById('cfg-pkg-lt-badge').value.trim(),
+        features: document.getElementById('cfg-pkg-lt-features').value.split('\n').map(s => s.trim()).filter(Boolean)
+      };
+
+      try {
+        const res = await fetchAdminApi('/api/admin/packages-config', {
+          method: 'POST',
+          body: JSON.stringify({ '1year': pkg1y, 'lifetime': pkgLt })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          globalData.packages = data.packages;
+          showToast('✅ Đã lưu cấu hình gói Gold Trang Chủ thành công!');
+        } else {
+          showToast('❌ ' + (data.error || 'Lỗi khi lưu cấu hình'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function loadContactConfig() {
+      let c = globalData.contact;
+      if (!c) {
+        try {
+          const res = await fetchAdminApi('/api/admin/contact-config');
+          if (res.ok) {
+            const d = await res.json();
+            if (d.contact) {
+              c = d.contact;
+              globalData.contact = c;
+            }
+          }
+        } catch (_) {}
+      }
+      if (!c) c = {};
+
+      const elFb = document.getElementById('cfg-contact-fb');
+      const elTele = document.getElementById('cfg-contact-tele');
+      const elZalo = document.getElementById('cfg-contact-zalo');
+      const elText = document.getElementById('cfg-contact-text');
+
+      if (elFb) elFb.value = c.facebook || '';
+      if (elTele) elTele.value = c.telegram || '';
+      if (elZalo) elZalo.value = c.zalo || c.hotline || '';
+      if (elText) elText.value = c.supportText || '';
+    }
+
+    async function handleSaveContactConfig(e) {
+      e.preventDefault();
+      const facebook = document.getElementById('cfg-contact-fb').value.trim();
+      const telegram = document.getElementById('cfg-contact-tele').value.trim();
+      const zalo = document.getElementById('cfg-contact-zalo').value.trim();
+      const supportText = document.getElementById('cfg-contact-text').value.trim();
+
+      try {
+        const res = await fetchAdminApi('/api/admin/contact-config', {
+          method: 'POST',
+          body: JSON.stringify({ facebook, telegram, zalo, hotline: zalo, supportText })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          globalData.contact = data.contact;
+          showToast('✅ Đã lưu thông tin liên hệ Admin thành công!');
+        } else {
+          showToast('❌ ' + (data.error || 'Lỗi khi lưu liên hệ'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function loadUpstreamInfo(showSuccessToast = false) {
+      const badge = document.getElementById('upstream-badge-status');
+      const dashBadge = document.getElementById('dash-upstream-badge');
+      const box = document.getElementById('upstream-live-info');
+      const topbarPill = document.getElementById('topbar-upstream-pill');
+      try {
+        const res = await fetchAdminApi('/api/admin/upstream-info');
+        if (res.ok) {
+          const data = await res.json();
+          const inp = document.getElementById('cfg-upstream-key');
+          if (inp && data.apiKey !== undefined) inp.value = data.apiKey || '';
+
+          if (data.configured && data.upstreamData) {
+            const u = data.upstreamData;
+            const balanceFormatted = (Number(u.balance) || 0).toLocaleString('vi-VN') + 'đ';
+            const reqsFormatted = (Number(u.remaining_requests) || 0).toLocaleString('vi-VN') + ' lượt';
+
+            if (badge) {
+              badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+              badge.textContent = '🟢 Đã kết nối Web Mẹ';
+            }
+            if (dashBadge) {
+              dashBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+              dashBadge.textContent = '🟢 Online';
+            }
+            if (box) box.classList.remove('hidden');
+            if (topbarPill) topbarPill.classList.remove('hidden');
+
+            document.getElementById('upstream-ctv-user').textContent = '@' + (u.username || 'N/A');
+            document.getElementById('upstream-ctv-balance').textContent = balanceFormatted;
+            document.getElementById('upstream-ctv-requests').textContent = reqsFormatted;
+
+            document.getElementById('dash-upstream-user').textContent = '@' + (u.username || 'N/A');
+            document.getElementById('dash-upstream-balance').textContent = balanceFormatted;
+            document.getElementById('dash-upstream-requests').textContent = reqsFormatted;
+
+            document.getElementById('topbar-upstream-balance').textContent = balanceFormatted;
+            document.getElementById('stat-upstream-balance-quick').textContent = balanceFormatted;
+            document.getElementById('stat-upstream-requests-quick').textContent = 'Còn lại: ' + reqsFormatted;
+
+            if (showSuccessToast) showToast(`✅ Kết nối Web Mẹ thành công! CTV: @${u.username}`);
+          } else if (data.configured && data.error) {
+            if (badge) {
+              badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20';
+              badge.textContent = '🔴 Lỗi xác thực Web Mẹ';
+            }
+            if (dashBadge) {
+              dashBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20';
+              dashBadge.textContent = '🔴 Lỗi Key';
+            }
+            if (box) box.classList.add('hidden');
+            if (topbarPill) topbarPill.classList.add('hidden');
+            if (showSuccessToast) showToast('⚠️ ' + data.error);
+          } else {
+            if (badge) {
+              badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-slate-400';
+              badge.textContent = '⚪ Chưa cấu hình';
+            }
+            if (dashBadge) {
+              dashBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-slate-400';
+              dashBadge.textContent = '⚪ Chưa nối';
+            }
+            if (box) box.classList.add('hidden');
+            if (topbarPill) topbarPill.classList.add('hidden');
+          }
+        }
+      } catch (e) {
+        if (showSuccessToast) showToast('❌ Lỗi kết nối máy chủ');
+      }
+    }
+
+    async function handleSaveUpstreamKey(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const apiKey = document.getElementById('cfg-upstream-key').value.trim();
+      const res = await fetchAdminApi('/api/admin/upstream-key', {
+        method: 'POST',
+        body: JSON.stringify({ apiKey })
+      });
+      if (res.ok) {
+        showToast('🌐 Đã lưu API Key Web Mẹ!');
+        loadUpstreamInfo(true);
+      } else {
+        showToast('❌ Lỗi lưu API Key Web Mẹ!');
+      }
+    }
+
+    async function loadSepayConfig() {
+      try {
+        const webhookUrl = window.location.origin + '/api/sepay/webhook';
+        const urlInp = document.getElementById('cfg-sepay-webhook-url');
+        if (urlInp) urlInp.value = webhookUrl;
+
+        const res = await fetchAdminApi('/api/admin/sepay-config');
+        if (res.ok) {
+          const cfg = await res.json();
+          const secEl = document.getElementById('cfg-sepay-secret');
+          const keyEl = document.getElementById('cfg-sepay-api-key');
+          const accEl = document.getElementById('cfg-sepay-account-no');
+          const brdEl = document.getElementById('cfg-sepay-bank-brand');
+          const namEl = document.getElementById('cfg-sepay-account-name');
+
+          if (secEl) secEl.value = cfg.webhookSecret || '';
+          if (keyEl) keyEl.value = cfg.apiKey || '';
+          if (accEl) accEl.value = cfg.accountNo || '';
+          if (brdEl) brdEl.value = cfg.bankBrand || '';
+          if (namEl) namEl.value = cfg.accountName || '';
+        }
+      } catch (e) {}
+    }
+
+    function copySepayWebhookUrl() {
+      const urlInp = document.getElementById('cfg-sepay-webhook-url');
+      if (!urlInp || !urlInp.value) return;
+      navigator.clipboard.writeText(urlInp.value);
+      showToast('📋 Đã copy Webhook URL vào clipboard!');
+    }
+
+    async function handleSaveSepayConfig(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const webhookSecret = document.getElementById('cfg-sepay-secret').value.trim();
+      const apiKey = document.getElementById('cfg-sepay-api-key').value.trim();
+      const accountNo = document.getElementById('cfg-sepay-account-no').value.trim();
+      const bankBrand = document.getElementById('cfg-sepay-bank-brand').value.trim();
+      const accountName = document.getElementById('cfg-sepay-account-name').value.trim();
+
+      const res = await fetchAdminApi('/api/admin/sepay-config', {
+        method: 'POST',
+        body: JSON.stringify({ webhookSecret, apiKey, accountNo, bankBrand, accountName })
+      });
+
+      if (res.ok) {
+        showToast('💳 Đã lưu cấu hình SePay Webhook & VietQR thành công!');
+        loadSepayConfig();
+      } else {
+        const data = await res.json();
+        showToast('❌ ' + (data.error || 'Lỗi lưu cấu hình SePay'));
+      }
+    }
+
+    async function handleTestSepayTransactions(limit = 10) {
+      const resultEl = document.getElementById('test-sepay-tx-result');
+      if (!resultEl) return;
+      resultEl.classList.remove('hidden');
+      resultEl.className = 'p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all bg-black/40 border border-white/10 text-slate-300';
+      resultEl.textContent = `⏳ Đang thử nghiệm kết nối API SePay (lấy ${limit} GD)...`;
+
+      try {
+        const res = await fetchAdminApi(`/api/admin/sepay-transactions?limit=${limit}`);
+        const data = await res.json();
+        if (res.ok && data.success) {
+          resultEl.className = 'p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all bg-emerald-500/10 border border-emerald-500/30 text-emerald-300';
+          resultEl.textContent = [
+            `✅ Thành công! Tìm thấy ${data.count} giao dịch từ SePay:`,
+            '',
+            JSON.stringify(data.transactions, null, 2)
+          ].join('\n');
+        } else {
+          resultEl.className = 'p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all bg-rose-500/10 border border-rose-500/30 text-rose-300';
+          resultEl.textContent = '❌ ' + (data.error || 'Thất bại kết nối API SePay');
+        }
+      } catch (e) {
+        resultEl.className = 'p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all bg-rose-500/10 border border-rose-500/30 text-rose-300';
+        resultEl.textContent = '❌ Lỗi kết nối: ' + e.message;
+      }
+    }
+
+    async function handleRunSepayWebhookTest() {
+      const resultEl = document.getElementById('test-sepay-sim-result');
+      if (!resultEl) return;
+      const amount = Number(document.getElementById('test-sepay-sim-amount')?.value) || 50000;
+      const content = document.getElementById('test-sepay-sim-memo')?.value.trim() || 'NAP_CTV';
+      const username = document.getElementById('test-sepay-sim-user')?.value.trim() || '';
+
+      resultEl.classList.remove('hidden');
+      resultEl.className = 'p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all bg-black/40 border border-white/10 text-slate-300';
+      resultEl.textContent = `⏳ Đang gửi payload giả lập SePay (${amount.toLocaleString('vi-VN')}đ, memo: ${content})...`;
+
+      try {
+        const res = await fetchAdminApi('/api/admin/sepay-webhook-test', {
+          method: 'POST',
+          body: JSON.stringify({ amount, content, username })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          resultEl.className = 'p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all bg-emerald-500/10 border border-emerald-500/30 text-emerald-300';
+          resultEl.textContent = [
+            `✅ ${data.message || 'Chạy test webhook thành công!'}`,
+            '',
+            `Các bước thực hiện:`,
+            ...(data.steps || []).map(s => `• Bước ${s.step} (${s.name}): ${s.ok ? '✓ Thành công' : '✗ Thất bại'} — ${s.detail}`),
+            '',
+            `Chi tiết trả về: ${JSON.stringify(data, null, 2)}`
+          ].join('\n');
+          loadAdminData();
+          loadSepayLogs();
+        } else {
+          resultEl.className = 'p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all bg-rose-500/10 border border-rose-500/30 text-rose-300';
+          resultEl.textContent = '❌ ' + (data.error || 'Lỗi chạy test webhook');
+        }
+      } catch (e) {
+        resultEl.className = 'p-3.5 rounded-xl text-xs font-mono whitespace-pre-wrap break-all bg-rose-500/10 border border-rose-500/30 text-rose-300';
+        resultEl.textContent = '❌ Lỗi kết nối: ' + e.message;
+      }
+    }
+
+    async function loadSepayLogs(isManual = false) {
+      const icon = document.getElementById('sepay-logs-refresh-icon');
+      if (icon && isManual) icon.classList.add('animate-spin');
+      try {
+        const res = await fetchAdminApi('/api/admin/sepay-logs?limit=50');
+        if (res.ok) {
+          const data = await res.json();
+          renderSepayLogs(data.logs || []);
+          if (isManual) showToast('🔄 Đã làm mới lịch sử SePay Webhook!');
+        }
+      } catch (e) {
+        console.error('Lỗi tải SePay Logs:', e);
+      } finally {
+        if (icon) setTimeout(() => icon.classList.remove('animate-spin'), 500);
+      }
+    }
+
+    function renderSepayLogs(logs) {
+      const tbody = document.getElementById('sepay-logs-tbody');
+      if (!tbody) return;
+
+      if (!logs || logs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-4 py-8 text-center text-slate-500 font-sans">
+              📭 Chưa có lịch sử nhận Webhook từ SePay nào.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = logs.map(item => {
+        const timeStr = item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : '--';
+        const amountStr = `+${Number(item.amount || 0).toLocaleString('vi-VN')}đ`;
+
+        let typeBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-700 text-slate-300">Chưa Khớp</span>';
+        if (item.matchType === 'RETAIL_ORDER') {
+          typeBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">🛒 Khách Lẻ</span>';
+        } else if (item.matchType === 'CTV_DEPOSIT') {
+          typeBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">👥 Nạp CTV</span>';
+        }
+
+        let statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400">✅ Thành Công</span>';
+        if (item.status === 'PENDING') {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300">⏳ Chưa Khớp</span>';
+        } else if (item.status === 'FAILED') {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300">❌ Lỗi</span>';
+        }
+
+        return `
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <td class="px-4 py-3 font-bold text-slate-200">#${item.txId}</td>
+            <td class="px-4 py-3 text-slate-400 whitespace-nowrap">${timeStr}</td>
+            <td class="px-4 py-3 font-bold text-emerald-400">${amountStr}</td>
+            <td class="px-4 py-3 text-slate-300 font-sans max-w-xs truncate" title="${item.content || ''}">${item.content || '--'}</td>
+            <td class="px-4 py-3 whitespace-nowrap">${typeBadge}</td>
+            <td class="px-4 py-3 text-slate-300 font-sans">
+              <div class="font-bold text-white">${item.matchedTarget || '--'}</div>
+              <div class="text-[10px] text-slate-400 truncate max-w-xs">${item.detail || ''}</div>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">${statusBadge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function handleClearSepayLogs() {
+      if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử nhận Webhook SePay?')) return;
+      try {
+        const res = await fetchAdminApi('/api/admin/sepay-logs', { method: 'DELETE' });
+        if (res.ok) {
+          showToast('🗑️ Đã xóa lịch sử SePay Webhook!');
+          loadSepayLogs();
+        } else {
+          showToast('❌ Lỗi xóa lịch sử SePay');
+        }
+      } catch (e) {
+        showToast('❌ Lỗi kết nối máy chủ');
+      }
+    }
+
+    async function handleSaveDefaultPrices(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const p1y = Number(document.getElementById('cfg-p1y').value) || 65000;
+      const plt = Number(document.getElementById('cfg-plt').value) || 350000;
+      const res = await fetchAdminApi('/api/admin/prices', {
+        method: 'POST',
+        body: JSON.stringify({ prices: { '1year': p1y, 'lifetime': plt } })
+      });
+      if (res.ok) {
+        showToast('🏷️ Đã lưu bảng giá sỉ mặc định thành công!');
+      } else {
+        showToast('❌ Lỗi lưu bảng giá sỉ');
+      }
+    }
+
+    async function handleChangeAdminCredentials(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const newUsername = document.getElementById('cfg-admin-user').value.trim();
+      const newPassword = document.getElementById('cfg-admin-pass').value.trim();
+
+      if (!newUsername || newUsername.length < 3) {
+        showToast('⚠️ Tên đăng nhập Admin mới phải từ 3 ký tự trở lên');
+        return;
+      }
+      if (!newPassword || newPassword.length < 4) {
+        showToast('⚠️ Mật khẩu Admin mới phải từ 4 ký tự trở lên');
+        return;
+      }
+
+      const res = await fetchAdminApi('/api/admin/change-credentials', {
+        method: 'POST',
+        body: JSON.stringify({ newUsername, newPassword })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        showToast('🔑 ' + (data.message || 'Đã cập nhật tài khoản Admin thành công!'));
+        document.getElementById('cfg-admin-pass').value = '';
+        loadAdminData();
+      } else {
+        const data = await res.json();
+        showToast('❌ ' + (data.error || 'Lỗi đổi tài khoản Admin'));
+      }
+    }
+
+    async function loadTelegramToken() {
+      try {
+        const res = await fetchAdminApi('/api/admin/telegram-token');
+        if (res.ok) {
+          const data = await res.json();
+          const inp = document.getElementById('cfg-telegram-token');
+          if (inp) inp.value = data.token || '';
+        }
+      } catch (e) {}
+    }
+
+    async function handleSaveTelegramToken(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const token = document.getElementById('cfg-telegram-token').value.trim();
+      const res = await fetchAdminApi('/api/admin/telegram-token', {
+        method: 'POST',
+        body: JSON.stringify({ token })
+      });
+      if (res.ok) {
+        showToast('🤖 Đã lưu Telegram Bot Token thành công!');
+      } else {
+        showToast('❌ Lỗi lưu Telegram Bot Token!');
+      }
+    }
+
+    function renderAll() {
+      const ctvList = ctvData.ctvAccounts || [];
+      const ctvOrdersList = ctvData.ctvOrders || [];
+      const publicOrdersList = globalData.orders || [];
+
+      const totalCtvBalance = ctvList.reduce((acc, c) => acc + (Number(c.balance) || 0), 0);
+      const totalPublicRevenue = publicOrdersList
+        .filter(o => o.status === 'COMPLETED')
+        .reduce((acc, o) => acc + (Number(o.amount) || 0), 0);
+
+      document.getElementById('stat-ctv-count').textContent = ctvList.length;
+      document.getElementById('stat-ctv-balance-total').textContent = totalCtvBalance.toLocaleString('vi-VN') + 'đ';
+      document.getElementById('stat-orders-completed').textContent = ctvOrdersList.length;
+
+      document.getElementById('stat-public-orders-total').textContent = publicOrdersList.length;
+      document.getElementById('stat-public-revenue-total').textContent = 'Doanh thu: ' + totalPublicRevenue.toLocaleString('vi-VN') + 'đ';
+
+      const navCtvCount = document.getElementById('nav-count-ctv');
+      const navOrderCount = document.getElementById('nav-count-orders');
+      const navPublicCount = document.getElementById('nav-count-public-orders');
+      if (navCtvCount) navCtvCount.textContent = ctvList.length;
+      if (navOrderCount) navOrderCount.textContent = ctvOrdersList.length;
+      if (navPublicCount) navPublicCount.textContent = publicOrdersList.length;
+
+      renderCtvAccounts();
+      renderCtvOrders();
+      renderPublicOrders();
+      renderRecentPublicOrdersWidget();
+    }
+
+    const TAB_TITLES = {
+      'tab-dashboard': { title: 'Bảng Điều Khiển Overview', breadcrumb: 'Dashboard Overview' },
+      'tab-ctv': { title: 'Quản Lý Tài Khoản CTV', breadcrumb: 'Quản lý CTV' },
+      'tab-ctv-orders': { title: 'Nhật Ký Đơn Hàng Nâng Cấp Gold CTV', breadcrumb: 'Lịch sử Đơn CTV' },
+      'tab-public-orders': { title: 'Lịch Sử Đơn Hàng Web Chính (Khách Lẻ)', breadcrumb: 'Đơn Hàng Web Chính' },
+      'tab-upstream': { title: 'Cấu Hình Web Mẹ locketgold.click', breadcrumb: 'Upstream Web Mẹ' },
+      'tab-sepay': { title: 'Thanh Toán SePay Webhook VietQR', breadcrumb: 'Cổng SePay Auto' },
+      'tab-telegram': { title: 'Cấu Hình Bot Telegram 24/7', breadcrumb: 'Telegram Bot' },
+      'tab-wholesale-prices': { title: 'Bảng Giá Sỉ Mặc Định Cho CTV', breadcrumb: 'Bảng Giá Sỉ' },
+      'tab-retail-packages': { title: 'Bảng Giá Khách Lẻ Trang Chủ', breadcrumb: 'Nội Dung Gói Gold' },
+      'tab-brand': { title: 'Thương Hiệu, Logo & SEO Titles', breadcrumb: 'Branding & Identity' },
+      'tab-notice': { title: 'Thông Báo Bật Bảng Popup', breadcrumb: 'Popup Notice' },
+      'tab-faqs': { title: 'Cấu Hình Câu Hỏi Trợ Giúp FAQ', breadcrumb: 'FAQ Management' },
+      'tab-contact': { title: 'Cài Đặt Kênh Support 24/7', breadcrumb: 'Thông Tin Liên Hệ' },
+      'tab-admin-creds': { title: 'Tài Khoản & Mật Khẩu Admin', breadcrumb: 'Admin Credentials' }
+    };
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      
+      // Update Sidebar Nav State
+      document.querySelectorAll('.sb-nav-link').forEach(el => {
+        el.className = 'sb-nav-link flex items-center justify-between px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-slate-300 hover:text-white';
+      });
+      const activeSidebarNav = document.getElementById('nav-' + tabId);
+      if (activeSidebarNav) {
+        activeSidebarNav.className = 'sb-nav-link flex items-center justify-between px-3 py-2.5 rounded-xl transition-all hover:bg-white/5 text-amber-400 bg-amber-500/10 font-bold border border-amber-500/20';
+      }
+
+      // Update Mobile Bottom Nav State
+      document.querySelectorAll('.mob-tab-btn').forEach(el => {
+        el.className = 'mob-tab-btn py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-bold text-slate-400 hover:text-white transition-all cursor-pointer';
+      });
+      const activeMobBtn = document.getElementById('mob-btn-' + tabId);
+      if (activeMobBtn) {
+        activeMobBtn.className = 'mob-tab-btn py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 transition-all cursor-pointer';
+      }
+
+      // Update Topbar Titles
+      const info = TAB_TITLES[tabId] || { title: 'Quản Lý Hệ Thống', breadcrumb: 'Cài Đặt' };
+      const topTitle = document.getElementById('topbar-title');
+      const topBreadcrumb = document.getElementById('topbar-breadcrumb');
+      if (topTitle) topTitle.textContent = info.title;
+      if (topBreadcrumb) topBreadcrumb.textContent = info.breadcrumb;
+
+      const targetTab = document.getElementById(tabId);
+      if (targetTab) targetTab.classList.remove('hidden');
+
+      // Auto refresh data for target tab to ensure fields are populated
+      if (tabId === 'tab-public-orders') loadPublicOrders();
+      else if (tabId === 'tab-brand') loadBrandConfig();
+      else if (tabId === 'tab-notice') loadNoticeConfig();
+      else if (tabId === 'tab-faqs') loadFaqsConfig();
+      else if (tabId === 'tab-retail-packages') loadCustomerPackagesConfig();
+      else if (tabId === 'tab-contact') loadContactConfig();
+      else if (tabId === 'tab-sepay') loadSepayConfig();
+      else if (tabId === 'tab-telegram') loadTelegramToken();
+      else if (tabId === 'tab-upstream') loadUpstreamInfo();
+      else if (tabId === 'tab-wholesale-prices' && globalData.prices) {
+        const p1yInp = document.getElementById('cfg-p1y');
+        const pltInp = document.getElementById('cfg-plt');
+        if (p1yInp) p1yInp.value = globalData.prices['1year'] || 65000;
+        if (pltInp) pltInp.value = globalData.prices['lifetime'] || 350000;
+      }
+      else if (tabId === 'tab-admin-creds' && globalData.adminUser) {
+        const el = document.getElementById('cfg-admin-user');
+        if (el) el.value = globalData.adminUser;
+      }
+
+      // Auto close sidebar on mobile after tab select
+      if (window.innerWidth < 1024) {
+        toggleSidebar(false);
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setCtvViewMode(mode) {
+      currentCtvViewMode = mode;
+      const btnCards = document.getElementById('btn-view-cards');
+      const btnTable = document.getElementById('btn-view-table');
+      const containerCards = document.getElementById('container-ctv-cards');
+      const containerTable = document.getElementById('container-ctv-table');
+
+      if (mode === 'cards') {
+        if (btnCards) btnCards.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-amber-950 shadow-xs transition-all cursor-pointer';
+        if (btnTable) btnTable.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer';
+        if (containerCards) containerCards.classList.remove('hidden');
+        if (containerTable) containerTable.classList.add('hidden');
+      } else {
+        if (btnTable) btnTable.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-amber-950 shadow-xs transition-all cursor-pointer';
+        if (btnCards) btnCards.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer';
+        if (containerTable) containerTable.classList.remove('hidden');
+        if (containerCards) containerCards.classList.add('hidden');
+      }
+      renderCtvAccounts();
+    }
+
+    function toggleShowPassword(username) {
+      showPassState[username] = !showPassState[username];
+      renderCtvAccounts();
+    }
+
+    async function handleCreateCtv(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const username = document.getElementById('ctv-user-in').value.trim();
+      const password = document.getElementById('ctv-pass-in').value.trim();
+      const p1y = Number(document.getElementById('ctv-p1y-in').value);
+      const plt = Number(document.getElementById('ctv-plt-in').value);
+
+      if (!username || !password) {
+        showToast('⚠️ Vui lòng nhập Username và Mật khẩu CTV!');
+        return;
+      }
+
+      const res = await fetchAdminApi('/api/admin/ctv', {
+        method: 'POST',
+        body: JSON.stringify({ username, password, prices: { '1year': p1y, 'lifetime': plt } })
+      });
+
+      if (res.ok) {
+        showToast(`🤝 Đã tạo CTV @${username}!`);
+        document.getElementById('ctv-user-in').value = '';
+        document.getElementById('ctv-pass-in').value = '';
+        loadAdminData();
+      } else {
+        const data = await res.json();
+        showToast('❌ ' + (data.error || 'Lỗi tạo CTV'));
+      }
+    }
+
+    async function handleUpdateCtvPrices(username) {
+      const p1y = Number(prompt(`Nhập giá gói 1 năm mới cho CTV @${username}:`, '65000'));
+      if (!p1y) return;
+      const plt = Number(prompt(`Nhập giá gói Vĩnh Viễn mới cho CTV @${username}:`, '350000'));
+      if (!plt) return;
+
+      const res = await fetchAdminApi('/api/admin/ctv/prices', {
+        method: 'POST',
+        body: JSON.stringify({ username, prices: { '1year': p1y, 'lifetime': plt } })
+      });
+      if (res.ok) {
+        showToast(`✏️ Đã cập nhật giá cho @${username}`);
+        loadAdminData();
+      }
+    }
+
+    async function handleDepositCtv(username) {
+      const amtStr = prompt(`Nhập số tiền muốn nạp (hoặc âm để trừ) cho CTV @${username} (VNĐ):`, '100000');
+      if (!amtStr) return;
+      const amount = Number(amtStr);
+      if (isNaN(amount)) return;
+
+      const res = await fetchAdminApi('/api/admin/ctv/balance', {
+        method: 'POST',
+        body: JSON.stringify({ username, amount })
+      });
+      if (res.ok) {
+        showToast(`💵 Đã cộng/trừ ${amount.toLocaleString('vi-VN')}đ cho CTV @${username}`);
+        loadAdminData();
+      }
+    }
+
+    async function handleChangeCtvPassword(username) {
+      const newPassword = prompt(`Nhập mật khẩu MỚI cho CTV @${username}:`);
+      if (!newPassword || newPassword.trim().length < 4) {
+        if (newPassword !== null) showToast('⚠️ Mật khẩu mới phải từ 4 ký tự trở lên!');
+        return;
+      }
+      const res = await fetchAdminApi('/api/admin/ctv/password', {
+        method: 'POST',
+        body: JSON.stringify({ username, newPassword: newPassword.trim() })
+      });
+      if (res.ok) {
+        showToast(`🔑 Đã đổi mật khẩu thành công cho CTV @${username}!`);
+        loadAdminData();
+      } else {
+        const data = await res.json();
+        showToast('❌ ' + (data.error || 'Lỗi đổi mật khẩu'));
+      }
+    }
+
+    async function handleChangeCtvApiKey(username) {
+      const newApiKey = prompt(`Nhập API Key tùy chỉnh cho CTV @${username}:`);
+      if (newApiKey === null) return;
+
+      const res = await fetchAdminApi('/api/admin/ctv/api-key', {
+        method: 'POST',
+        body: JSON.stringify({ username, apiKey: newApiKey.trim() })
+      });
+      if (res.ok) {
+        showToast(`🔑 Đã đổi API Key thành công cho CTV @${username}!`);
+        loadAdminData();
+      } else {
+        const data = await res.json();
+        showToast('❌ ' + (data.error || 'Lỗi đổi API Key'));
+      }
+    }
+
+    async function handleDeleteCtv(username) {
+      if (!confirm(`Bạn có chắc chắn muốn XÓA tài khoản CTV @${username}?`)) return;
+      const res = await fetchAdminApi(`/api/admin/ctv/${encodeURIComponent(username)}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        showToast(`🗑️ Đã xóa CTV @${username}`);
+        loadAdminData();
+      } else {
+        const data = await res.json();
+        showToast('❌ ' + (data.error || 'Lỗi xóa CTV'));
+      }
+    }
+
+    function renderCtvAccounts() {
+      const q = (document.getElementById('ctv-search')?.value || '').toLowerCase();
+      let list = ctvData.ctvAccounts || [];
+      if (q) {
+        list = list.filter(c => c.username?.toLowerCase().includes(q) || c.displayName?.toLowerCase().includes(q));
+      }
+
+      // 1. Render Cards View (Mobile Friendly)
+      const cardsContainer = document.getElementById('container-ctv-cards');
+      if (cardsContainer) {
+        if (list.length === 0) {
+          cardsContainer.innerHTML = '<div class="p-8 text-center text-slate-500 text-xs col-span-full">Chưa có CTV nào.</div>';
+        } else {
+          cardsContainer.innerHTML = list.map((c, idx) => {
+            const isShowPass = showPassState[c.username];
+            const passText = isShowPass ? (c.password !== undefined && c.password !== null ? String(c.password) : 'N/A') : '••••••••';
+            return `
+              <div class="sb-card p-4 sm:p-5 space-y-3.5 border-white/10 relative overflow-hidden">
+                <div class="flex items-center justify-between gap-3 pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 text-amber-950 font-black flex items-center justify-center text-sm shadow-md">
+                      ${c.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div class="font-extrabold text-sm text-amber-400 flex items-center gap-1.5">
+                        <span>@${c.username}</span>
+                        <span class="text-slate-400 text-[10px] font-mono">#${idx + 1}</span>
+                      </div>
+                      <div class="text-[10px] text-slate-400 font-medium">${c.displayName || 'Đại Lý CTV'}</div>
+                    </div>
+                  </div>
+
+                  <div class="text-right">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase">Ví CTV</div>
+                    <div class="font-mono font-black text-base text-amber-400">${(c.balance || 0).toLocaleString('vi-VN')}đ</div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs bg-black/40 p-3 rounded-xl border border-white/10 font-semibold">
+                  <div>
+                    <span class="text-[10px] text-slate-400 block">Mật khẩu</span>
+                    <span class="font-mono font-bold text-amber-300 select-all">${passText}</span>
+                    <button onclick="toggleShowPassword('${c.username}')" class="ml-1 text-slate-400 hover:text-amber-500 transition-colors cursor-pointer text-[10px]">
+                      ${isShowPass ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-slate-400 block">Telegram</span>
+                    ${c.telegramChatId 
+                      ? `<span class="inline-flex items-center gap-1 text-emerald-400 font-mono text-[10px] font-bold">🟢 ${c.telegramChatId}</span>`
+                      : `<span class="text-rose-500 font-bold text-[10px]">🔴 Chưa nối</span>`}
+                  </div>
+                  <div class="mt-1">
+                    <span class="text-[10px] text-slate-400 block">Giá sỉ 1 Năm</span>
+                    <span class="font-mono font-bold text-emerald-400">${(c.prices?.['1year'] || 65000).toLocaleString('vi-VN')}đ</span>
+                  </div>
+                  <div class="mt-1">
+                    <span class="text-[10px] text-slate-400 block">Giá Vĩnh Viễn</span>
+                    <span class="font-mono font-bold text-amber-400">${(c.prices?.['lifetime'] || 350000).toLocaleString('vi-VN')}đ</span>
+                  </div>
+                </div>
+
+                <div class="text-[11px] text-slate-400 font-mono flex items-center justify-between bg-white/[0.03] px-3 py-2 rounded-xl border border-white/10">
+                  <span class="text-[10px] font-extrabold text-slate-500">API KEY:</span>
+                  <span class="select-all text-amber-400 font-bold truncate max-w-[200px]">${c.apiKey || 'N/A'}</span>
+                </div>
+
+                <!-- Action Button Grid -->
+                <div class="grid grid-cols-3 sm:flex sm:items-center sm:justify-end gap-1.5 pt-1">
+                  <button onclick="handleDepositCtv('${c.username}')" class="py-2 px-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 text-amber-400 text-xs font-bold border border-amber-500/20 transition-all cursor-pointer text-center">💵 Nạp Tiền</button>
+                  <button onclick="handleChangeCtvPassword('${c.username}')" class="py-2 px-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 text-amber-400 text-xs font-bold border border-amber-500/20 transition-all cursor-pointer text-center">🔒 Đổi Pass</button>
+                  <button onclick="handleChangeCtvApiKey('${c.username}')" class="py-2 px-2.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 active:scale-95 text-indigo-400 text-xs font-bold border border-indigo-500/20 transition-all cursor-pointer text-center">🔑 Sửa Key</button>
+                  <button onclick="handleUpdateCtvPrices('${c.username}')" class="py-2 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-slate-200 text-xs font-bold border border-white/10 transition-all cursor-pointer text-center">✏️ Sửa Giá</button>
+                  <button onclick="handleDeleteCtv('${c.username}')" class="col-span-2 sm:col-span-1 py-2 px-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 active:scale-95 text-rose-400 text-xs font-bold border border-rose-500/20 transition-all cursor-pointer text-center">🗑️ Xóa CTV</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // 2. Render Table View
+      const tbody = document.getElementById('tbody-ctv-accounts');
+      if (tbody) {
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">Chưa có CTV nào.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = list.map((c, idx) => {
+          const isShowPass = showPassState[c.username];
+          const passText = isShowPass ? (c.password !== undefined && c.password !== null ? String(c.password) : 'N/A') : '••••••••';
+          return `
+            <tr class="hover:bg-white/[0.03] transition-colors">
+              <td class="p-4">
+                <div class="font-black text-amber-400 flex items-center gap-1.5">
+                  <span class="text-slate-500 text-[11px]">#${idx + 1}</span> @${c.username}
+                </div>
+                <div class="text-[10px] text-slate-400 font-medium">${c.displayName || c.username}</div>
+              </td>
+              <td class="p-4 font-mono text-xs">
+                <span class="font-bold text-amber-300 select-all">${passText}</span>
+                <button onclick="toggleShowPassword('${c.username}')" class="ml-1.5 text-slate-400 hover:text-amber-500 transition-colors cursor-pointer text-[10px]">
+                  ${isShowPass ? '🙈' : '👁️'}
+                </button>
+              </td>
+              <td class="p-4 font-bold text-emerald-400 font-mono">${(c.prices?.['1year'] || 65000).toLocaleString('vi-VN')}đ</td>
+              <td class="p-4 font-bold text-amber-400 font-mono">${(c.prices?.['lifetime'] || 350000).toLocaleString('vi-VN')}đ</td>
+              <td class="p-4 font-mono font-black text-amber-400">${(c.balance || 0).toLocaleString('vi-VN')}đ</td>
+              <td class="p-4 font-mono text-[11px] text-slate-400">
+                <span class="select-all text-amber-400 font-bold">${c.apiKey || 'N/A'}</span>
+              </td>
+              <td class="p-4">
+                ${c.telegramChatId 
+                  ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono font-bold text-[10px]">🟢 ${c.telegramChatId}</span>`
+                  : `<span class="px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 font-bold text-[10px]">🔴 Chưa kết nối</span>`}
+              </td>
+              <td class="p-4 text-right space-x-1.5 whitespace-nowrap">
+                <button onclick="handleDepositCtv('${c.username}')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 text-amber-400 text-xs font-bold border border-amber-500/20 transition-all cursor-pointer">💵 Nạp Tiền</button>
+                <button onclick="handleChangeCtvPassword('${c.username}')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 text-amber-400 text-xs font-bold border border-amber-500/20 transition-all cursor-pointer">🔒 Đổi Pass</button>
+                <button onclick="handleChangeCtvApiKey('${c.username}')" class="px-2.5 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 active:scale-95 text-indigo-400 text-xs font-bold border border-indigo-500/20 transition-all cursor-pointer">🔑 Sửa Key</button>
+                <button onclick="handleUpdateCtvPrices('${c.username}')" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 text-slate-200 text-xs font-bold border border-white/10 transition-all cursor-pointer">✏️ Sửa Giá</button>
+                <button onclick="handleDeleteCtv('${c.username}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 active:scale-95 text-rose-400 text-xs font-bold border border-rose-500/20 transition-all cursor-pointer">🗑️ Xóa</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    let currentOrderViewMode = 'grouped';
+    let expandedCtvs = {};
+
+    function setOrderViewMode(mode) {
+      currentOrderViewMode = mode;
+      const btnGrouped = document.getElementById('btn-mode-grouped');
+      const btnFlat = document.getElementById('btn-mode-flat');
+      const containerGrouped = document.getElementById('container-ctv-orders-grouped');
+      const containerFlat = document.getElementById('container-ctv-orders-flat');
+
+      if (mode === 'grouped') {
+        if (btnGrouped) btnGrouped.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-amber-950 shadow-xs transition-all cursor-pointer';
+        if (btnFlat) btnFlat.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer';
+        if (containerGrouped) containerGrouped.classList.remove('hidden');
+        if (containerFlat) containerFlat.classList.add('hidden');
+      } else {
+        if (btnFlat) btnFlat.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-amber-950 shadow-xs transition-all cursor-pointer';
+        if (btnGrouped) btnGrouped.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer';
+        if (containerFlat) containerFlat.classList.remove('hidden');
+        if (containerGrouped) containerGrouped.classList.add('hidden');
+      }
+      renderCtvOrders();
+    }
+
+    function toggleCtvExpand(username) {
+      expandedCtvs[username] = !expandedCtvs[username];
+      renderCtvOrders();
+    }
+
+    async function handleDeleteSingleOrder(orderId, ctvUsername) {
+      if (!confirm(`Xóa đơn hàng ${orderId} khỏi hệ thống?`)) return;
+      const res = await fetchAdminApi(`/api/admin/ctv/orders/${encodeURIComponent(orderId)}${ctvUsername ? '?username=' + encodeURIComponent(ctvUsername) : ''}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        showToast(`🗑️ Đã xóa đơn hàng ${orderId}`);
+        loadAdminData();
+      } else {
+        const data = await res.json();
+        showToast('❌ ' + (data.error || 'Lỗi xóa đơn hàng'));
+      }
+    }
+
+    async function handleDeleteCtvOrdersAll(username) {
+      if (!confirm(`💣 BẠN CÓ CHẮC CHẮN MUỐN XÓA TOÀN BỘ LỊCH SỬ GIAO DỊCH CỦA CTV @${username}?`)) return;
+      const res = await fetchAdminApi(`/api/admin/ctv/${encodeURIComponent(username)}/orders`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        showToast(`💣 Đã xóa toàn bộ lịch sử CTV @${username}`);
+        loadAdminData();
+      } else {
+        const data = await res.json();
+        showToast('❌ ' + (data.error || 'Lỗi xóa lịch sử'));
+      }
+    }
+
+    function renderCtvOrders() {
+      const q = (document.getElementById('ctv-order-search')?.value || '').toLowerCase();
+      let list = ctvData.ctvOrders || [];
+      if (q) {
+        list = list.filter(o => o.orderId?.toLowerCase().includes(q) || o.ctvUsername?.toLowerCase().includes(q) || o.userUpgraded?.toLowerCase().includes(q));
+      }
+
+      // 1. Render Grouped View
+      const groupedContainer = document.getElementById('container-ctv-orders-grouped');
+      if (groupedContainer) {
+        const groupedMap = {};
+        for (const o of list) {
+          const u = (o.ctvUsername || 'khac').toLowerCase();
+          if (!groupedMap[u]) {
+            groupedMap[u] = {
+              ctvUsername: o.ctvUsername || u,
+              totalAmount: 0,
+              totalOrders: 0,
+              orders: []
+            };
+          }
+          groupedMap[u].totalAmount += Number(o.amount || 0);
+          groupedMap[u].totalOrders += 1;
+          groupedMap[u].orders.push(o);
+        }
+
+        const groupedList = Object.values(groupedMap).sort((a, b) => b.totalOrders - a.totalOrders);
+
+        if (groupedList.length === 0) {
+          groupedContainer.innerHTML = '<div class="p-8 text-center text-slate-500 text-xs">Chưa có giao dịch CTV nào.</div>';
+        } else {
+          groupedContainer.innerHTML = groupedList.map(group => {
+            const isExpanded = q ? true : Boolean(expandedCtvs[group.ctvUsername]);
+            return `
+              <div class="sb-card sb-card-interactive rounded-2xl overflow-hidden border border-white/10 transition-all duration-300">
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/40">
+                  <div class="flex items-center gap-3 cursor-pointer select-none" onclick="toggleCtvExpand('${group.ctvUsername}')">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 via-yellow-400 to-amber-600 text-amber-950 font-black flex items-center justify-center text-sm shadow-md shadow-amber-500/20">
+                      ${group.ctvUsername.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div class="font-black text-sm text-amber-400 flex items-center gap-2">
+                        <span>@${group.ctvUsername}</span>
+                        <span class="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-[10px] font-bold text-amber-400">Đại Lý Gold</span>
+                      </div>
+                      <div class="text-[11px] text-slate-400 font-semibold flex items-center gap-2 mt-0.5">
+                        <span class="font-mono font-black text-amber-400">${group.totalAmount.toLocaleString('vi-VN')}đ</span>
+                        <span>•</span>
+                        <span class="font-bold text-amber-400">${group.totalOrders} đơn nâng cấp</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-2 justify-between sm:justify-end w-full sm:w-auto">
+                    <button onclick="handleDeleteCtvOrdersAll('${group.ctvUsername}')" class="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 active:scale-95 text-rose-400 font-extrabold text-xs border border-rose-500/20 transition-all cursor-pointer flex items-center gap-1 shadow-xs">
+                      🗑️ Xóa Lịch Sử
+                    </button>
+                    <button onclick="toggleCtvExpand('${group.ctvUsername}')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 transition-all cursor-pointer text-xs font-extrabold text-slate-200">
+                      ${isExpanded ? '🔼 Thu gọn' : '🔽 Chi tiết (' + group.totalOrders + ')'}
+                    </button>
+                  </div>
+                </div>
+
+                ${isExpanded ? `
+                  <div class="p-4 border-t border-white/10 overflow-x-auto bg-black/20 animate-fade-in">
+                    <table class="w-full text-left text-xs">
+                      <thead class="text-amber-300 font-black uppercase text-[10px] border-b border-white/10">
+                        <tr>
+                          <th class="py-2.5 px-3">Mã Giao Dịch</th>
+                          <th class="py-2.5 px-3">User Được Nâng Cấp Gold</th>
+                          <th class="py-2.5 px-3">Gói Gold</th>
+                          <th class="py-2.5 px-3">Số Tiền Trừ Ví</th>
+                          <th class="py-2.5 px-3">Thời Gian</th>
+                          <th class="py-2.5 px-3 text-center">Xóa</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-white/5 font-semibold">
+                        ${group.orders.map(o => `
+                          <tr class="hover:bg-white/[0.04] transition-colors">
+                            <td class="py-2.5 px-3 font-mono text-[11px] text-slate-400 select-all">${o.orderId}</td>
+                            <td class="py-2.5 px-3 font-black text-white">@${o.userUpgraded}</td>
+                            <td class="py-2.5 px-3 font-bold">
+                              ${o.packageId === 'lifetime' 
+                                ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-[10px]">👑 Vĩnh Viễn</span>' 
+                                : '<span class="px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold text-[10px]">⭐ 1 Năm</span>'}
+                            </td>
+                            <td class="py-2.5 px-3 font-mono font-black text-amber-400">${(o.amount || 0).toLocaleString('vi-VN')}đ</td>
+                            <td class="py-2.5 px-3 text-slate-400 text-[11px] font-mono">${o.createdAt ? new Date(o.createdAt).toLocaleString('vi-VN') : '—'}</td>
+                            <td class="py-2.5 px-3 text-center">
+                              <button onclick="handleDeleteSingleOrder('${o.orderId}', '${group.ctvUsername}')" class="p-1.5 rounded-lg text-white hover:bg-rose-600 bg-rose-500 active:scale-90 transition-all cursor-pointer" title="Xóa đơn hàng này">
+                                🗑️
+                              </button>
+                            </td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // 2. Render Flat View Table
+      const tbody = document.getElementById('tbody-ctv-orders');
+      if (tbody) {
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">Chưa có giao dịch CTV nào.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = list.map(o => `
+          <tr class="hover:bg-white/[0.03] transition-colors">
+            <td class="p-4 font-mono text-[11px] text-slate-400 select-all">${o.orderId}</td>
+            <td class="p-4 font-bold text-amber-400">@${o.ctvUsername}</td>
+            <td class="p-4 font-extrabold text-white">@${o.userUpgraded}</td>
+            <td class="p-4 font-bold">
+              ${o.packageId === 'lifetime' 
+                ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-[10px]">👑 Vĩnh Viễn</span>' 
+                : '<span class="px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold text-[10px]">⭐ 1 Năm</span>'}
+            </td>
+            <td class="p-4 font-mono font-black text-amber-400">${(o.amount || 0).toLocaleString('vi-VN')}đ</td>
+            <td class="p-4 text-slate-400 text-[11px] font-mono">${o.createdAt ? new Date(o.createdAt).toLocaleString('vi-VN') : '—'}</td>
+            <td class="p-4 text-center">
+              <button onclick="handleDeleteSingleOrder('${o.orderId}', '${o.ctvUsername}')" class="p-1.5 rounded-lg text-white hover:bg-rose-600 bg-rose-500 active:scale-90 transition-all cursor-pointer" title="Xóa đơn hàng này">
+                🗑️
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // ── PUBLIC RETAIL ORDERS JAVASCRIPT LOGIC ──
+    function setPublicOrderFilter(filter) {
+      currentPublicOrderFilter = filter;
+      const filters = ['ALL', 'COMPLETED', 'PENDING', 'EXPIRED'];
+      filters.forEach(f => {
+        const btn = document.getElementById('btn-pfilter-' + f.toLowerCase());
+        if (btn) {
+          if (f === filter) {
+            btn.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-amber-950 shadow-xs transition-all cursor-pointer';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer';
+          }
+        }
+      });
+      renderPublicOrders();
+    }
+
+    async function handleManualCompleteOrder(uid) {
+      if (!confirm(`Kích hoạt Locket Gold thủ công cho đơn hàng UID: ${uid}?`)) return;
+      try {
+        const res = await fetchAdminApi('/api/admin/orders/complete', {
+          method: 'POST',
+          body: JSON.stringify({ uid })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`⚡ Đã kích hoạt Locket Gold thành công cho UID ${uid}!`);
+          loadAdminData();
+        } else {
+          showToast('❌ ' + (data.error || 'Lỗi khi kích hoạt Gold thủ công'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function handleDeletePublicOrder(orderId) {
+      if (!confirm(`Xóa đơn hàng web chính ${orderId}?`)) return;
+      try {
+        const res = await fetchAdminApi(`/api/admin/public-orders/${encodeURIComponent(orderId)}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`🗑️ Đã xóa đơn hàng ${orderId}`);
+          loadAdminData();
+        } else {
+          showToast('❌ ' + (data.error || 'Lỗi khi xóa đơn hàng'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function handleCleanupExpiredOrders() {
+      if (!confirm('Dọn dẹp & xóa tất cả các đơn hàng đã HẾT HẠN (15 phút)?')) return;
+      try {
+        const res = await fetchAdminApi('/api/admin/orders/cleanup-expired', {
+          method: 'POST'
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`🧹 Đã dọn dẹp thành công ${data.count || 0} đơn hàng hết hạn!`);
+          loadAdminData();
+        } else {
+          showToast('❌ ' + (data.error || 'Lỗi khi dọn dẹp đơn hết hạn'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function handleDeleteAllPublicOrders() {
+      if (!confirm('💣 BẠN CÓ CHẮC CHẮN MUỐN XÓA TOÀN BỘ LỊCH SỬ ĐƠN HÀNG WEB CHÍNH?')) return;
+      try {
+        const res = await fetchAdminApi('/api/admin/public-orders', {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast('💣 Đã xóa toàn bộ đơn hàng web chính thành công!');
+          loadAdminData();
+        } else {
+          showToast('❌ ' + (data.error || 'Lỗi khi xóa đơn hàng'));
+        }
+      } catch (err) {
+        showToast('❌ Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function loadPublicOrders() {
+      try {
+        const res = await fetchAdminApi('/api/admin/public-orders');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.orders) {
+            globalData.orders = data.orders;
+            renderPublicOrders();
+            renderRecentPublicOrdersWidget();
+            const navPublicCount = document.getElementById('nav-count-public-orders');
+            if (navPublicCount) navPublicCount.textContent = data.orders.length;
+            const statTotal = document.getElementById('stat-public-orders-total');
+            if (statTotal) statTotal.textContent = data.orders.length;
+            const totalRev = data.orders.filter(o => o.status === 'COMPLETED').reduce((acc, o) => acc + (Number(o.amount) || 0), 0);
+            const statRev = document.getElementById('stat-public-revenue-total');
+            if (statRev) statRev.textContent = 'Doanh thu: ' + totalRev.toLocaleString('vi-VN') + 'đ';
+          }
+        }
+      } catch (e) {
+        console.error('Error loading public orders:', e);
+      }
+    }
+
+    function renderPublicOrders() {
+      const q = (document.getElementById('public-order-search')?.value || '').toLowerCase();
+      let list = globalData.orders || [];
+
+      if (currentPublicOrderFilter !== 'ALL') {
+        list = list.filter(o => o.status === currentPublicOrderFilter);
+      }
+      if (q) {
+        list = list.filter(o => 
+          (o.orderId && o.orderId.toLowerCase().includes(q)) || 
+          (o.uid && o.uid.toLowerCase().includes(q)) || 
+          (o.username && o.username.toLowerCase().includes(q)) ||
+          (o.memo && o.memo.toLowerCase().includes(q))
+        );
+      }
+
+      const tbody = document.getElementById('tbody-public-orders');
+      if (tbody) {
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-500">Chưa có đơn hàng web chính nào phù hợp.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = list.map((o, idx) => {
+          let statusBadge = '';
+          if (o.status === 'COMPLETED') {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-[10px]">🟢 Hoàn Thành</span>';
+          } else if (o.status === 'EXPIRED') {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 font-bold text-[10px]">🔴 Hết Hạn</span>';
+          } else {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold text-[10px] animate-pulse">⏳ Chờ Chuyển Khoản</span>';
+          }
+
+          const targetUid = o.uid || o.orderId;
+          const pkgBadge = o.packageId === 'lifetime' 
+            ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-[10px]">👑 Vĩnh Viễn</span>' 
+            : '<span class="px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold text-[10px]">⭐ 1 Năm</span>';
+
+          return `
+            <tr class="hover:bg-white/[0.03] transition-colors">
+              <td class="p-3.5 font-mono text-[11px] text-slate-400">
+                <div class="font-bold text-white select-all">${o.orderId || o.uid}</div>
+                <div class="text-[10px] text-slate-500 select-all">UID: ${o.uid || '—'}</div>
+              </td>
+              <td class="p-3.5">
+                <div class="font-black text-amber-400 text-sm">@${o.username || 'N/A'}</div>
+              </td>
+              <td class="p-3.5 font-bold">${pkgBadge}</td>
+              <td class="p-3.5 font-mono font-black text-amber-400 text-xs">${(o.amount || 0).toLocaleString('vi-VN')}đ</td>
+              <td class="p-3.5 font-mono text-xs text-amber-300 font-extrabold select-all">${o.memo || '—'}</td>
+              <td class="p-3.5">${statusBadge}</td>
+              <td class="p-3.5 text-slate-400 text-[11px] font-mono whitespace-nowrap">
+                <div>Tạo: ${o.createdAt ? new Date(o.createdAt).toLocaleString('vi-VN') : '—'}</div>
+                ${o.completedAt ? `<div class="text-emerald-400">Xong: ${new Date(o.completedAt).toLocaleString('vi-VN')}</div>` : ''}
+              </td>
+              <td class="p-3.5 text-right space-x-1 whitespace-nowrap">
+                ${o.status !== 'COMPLETED' ? `
+                  <button onclick="handleManualCompleteOrder('${targetUid}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition-all cursor-pointer">
+                    ⚡ Kích Hoạt Gold
+                  </button>
+                ` : ''}
+                <button onclick="handleDeletePublicOrder('${o.orderId || o.uid}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold text-xs border border-rose-500/20 transition-all cursor-pointer">
+                  🗑️ Xóa
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderRecentPublicOrdersWidget() {
+      const container = document.getElementById('dash-recent-public-orders');
+      if (!container) return;
+      const list = (globalData.orders || []).slice(0, 5);
+
+      if (list.length === 0) {
+        container.innerHTML = '<div class="p-4 text-center text-slate-500 text-xs">Chưa có đơn hàng web chính nào.</div>';
+        return;
+      }
+
+      container.innerHTML = list.map(o => {
+        let statusText = o.status === 'COMPLETED' ? '<span class="text-emerald-400 font-bold">🟢 Đã kích hoạt Gold</span>' : (o.status === 'EXPIRED' ? '<span class="text-rose-400 font-bold">🔴 Hết hạn</span>' : '<span class="text-amber-400 font-bold">⏳ Đang chờ thanh toán</span>');
+        const targetUid = o.uid || o.orderId;
+        return `
+          <div class="p-3.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-3 overflow-hidden">
+              <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 font-black flex items-center justify-center text-sm shrink-0">
+                👑
+              </div>
+              <div class="truncate">
+                <div class="font-black text-white text-xs flex items-center gap-2">
+                  <span>@${o.username}</span>
+                  <span class="text-[10px] text-slate-400 font-mono">(${o.packageId === 'lifetime' ? 'Vĩnh Viễn' : '1 Năm'})</span>
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-2">
+                  <span>${(o.amount || 0).toLocaleString('vi-VN')}đ</span>
+                  <span>•</span>
+                  <span>${statusText}</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              ${o.status !== 'COMPLETED' ? `
+                <button onclick="handleManualCompleteOrder('${targetUid}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all cursor-pointer shrink-0">
+                  ⚡ Duyệt Gold
+                </button>
+              ` : `
+                <span class="text-[10px] font-mono text-slate-500">${o.completedAt ? new Date(o.completedAt).toLocaleTimeString('vi-VN') : ''}</span>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Auto-init on page load
+    initApp();
+  </script>
+</body>
+</html>

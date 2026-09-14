@@ -1,0 +1,131 @@
+================================================================================
+          TÀI LIỆU HƯỚNG DẪN ĐẤU NỐI API LOCKET GOLD (ENTERPRISE SPECIFICATION)
+================================================================================
+
+- Base URL    : https://locketgold.click
+- Content-Type: application/json
+- Định dạng   : JSON UTF-8
+
+--------------------------------------------------------------------------------
+1. 🔍 TRA CỨU THÔNG TIN NGƯỜI DÙNG & GOLD LIVE (/api/v1/userinfo)
+--------------------------------------------------------------------------------
+- Base URL  : https://locketgold.click
+- Phương thức: GET /api/v1/userinfo
+- Tham số   : user (Username Locket)
+- Ví dụ     : GET /api/v1/userinfo?user=vanle
+
+* Phản Hồi Thành Công (HTTP status 200 OK):
+{
+  "username": "vanle",
+  "displayName": "Văn Lê",
+  "uid": "3SpzULZxvMVoV53tE8SrSqD3",
+  "isGold": true,
+  "badge": "Locket Gold"
+}
+
+--------------------------------------------------------------------------------
+2. 👑 KÍCH HOẠT LOCKET GOLD CTV (POST /api/v1/ctv/gold)
+--------------------------------------------------------------------------------
+- Base URL  : https://locketgold.click
+- Phương thức: POST /api/v1/ctv/gold
+- Header    : x-api-key: {YOUR_API_KEY}
+- Body      : { "user": "vanle" }
+
+* Phản Hồi Thành Công (HTTP status 200 OK):
+{
+  "status": "success",
+  "message": "🎉 Kích hoạt Locket Gold 1 Năm HOÀN TẤT cho @vanle!"
+}
+
+* Phản Hồi Đã Có Gold (HTTP status 200 OK):
+{
+  "status": "info",
+  "already_has_gold": true,
+  "message": "ℹ️ Tài khoản @vanle đã có Locket Gold active từ trước."
+}
+
+* Phản Hồi Lỗi Hết Lượt Gói / Số Dư (HTTP status 400 Bad Request):
+{
+  "status": "error",
+  "code": 400,
+  "message": "Kho lượt gói nạp 1 Năm của bạn đã HẾT (0 lượt). Vui lòng mua thêm gói lượt trên website CTV!"
+}
+
+* Phản Hồi Lỗi API Key (HTTP status 401 Unauthorized):
+{
+  "status": "error",
+  "code": 401,
+  "message": "Xác minh thất bại! API Token Key không chính xác hoặc tài khoản CTV của bạn đã bị khóa."
+}
+
+* Phản Hồi Lỗi Username Bị Ban (HTTP status 403 Forbidden - Code 102):
+{
+  "status": "error",
+  "code": 102,
+  "message": "Tài khoản @vanle đã bị KHÓA (Banned) trên hệ thống!"
+}
+
+* Phản Hồi Lỗi Máy Chủ (HTTP status 500 Internal Server Error):
+{
+  "status": "error",
+  "code": 500,
+  "message": "Kích hoạt Gold thất bại: Lỗi kết nối máy chủ kích hoạt Gold. Đã hoàn lại 1 lượt gói cho CTV!"
+}
+
+--------------------------------------------------------------------------------
+3. 📦 KÍCH HOẠT GOLD THEO LƯỢT GÓI (POST /api/v1/ctv/gold-package)
+--------------------------------------------------------------------------------
+- Base URL  : https://locketgold.click
+- Phương thức: POST /api/v1/ctv/gold-package
+- Header    : x-api-key: {YOUR_API_KEY}
+- Body      : { "user": "vanle" }
+
+* Phản Hồi Thành Công (HTTP status 200 OK):
+{
+  "status": "success",
+  "message": "🎉 Kích hoạt Gold 1 Năm bằng Lượt Gói THÀNH CÔNG cho @vanle!"
+}
+
+--------------------------------------------------------------------------------
+4. 💰 TRA CỨU SỐ DƯ VÍ & LƯỢT GÓI CTV (GET /api/v1/ctv/me)
+--------------------------------------------------------------------------------
+- Base URL  : https://locketgold.click
+- Phương thức: GET /api/v1/ctv/me
+- Header    : x-api-key: {YOUR_API_KEY}
+
+* Phản Hồi Thành Công (HTTP status 200 OK):
+{
+  "status": "success",
+  "message": "Chào mừng CTV @dinhmanh!",
+  "data": {
+    "username": "dinhmanh",
+    "displayName": "Đình Mạnh CTV",
+    "balance": 4165900,
+    "remaining_requests": 249,
+    "prices": {
+      "1year": 65000
+    },
+    "active": true
+  }
+}
+
+--------------------------------------------------------------------------------
+5. 📜 TRA CỨU LỊCH SỬ ĐƠN HÀNG CTV (GET /api/v1/ctv/orders)
+--------------------------------------------------------------------------------
+- Base URL  : https://locketgold.click
+- Phương thức: GET /api/v1/ctv/orders
+- Header    : x-api-key: {YOUR_API_KEY}
+
+* Phản Hồi Thành Công (HTTP status 200 OK):
+{
+  "status": "success",
+  "orders": [
+    {
+      "orderId": "CTV_ORD_1785663510688_jyo2",
+      "userUpgraded": "vanle",
+      "packageId": "1year",
+      "amount": 65000,
+      "createdAt": "2026-08-06T18:30:00.000Z"
+    }
+  ]
+}
